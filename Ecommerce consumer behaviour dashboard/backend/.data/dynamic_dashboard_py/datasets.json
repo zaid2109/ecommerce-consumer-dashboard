@@ -1,0 +1,4597 @@
+{
+  "ds_e6101dd52a1849bca15338b7296187e3::v1": {
+    "tenant_id": null,
+    "dataset_id": "ds_e6101dd52a1849bca15338b7296187e3",
+    "version_id": 1,
+    "created_at": "2026-03-29T10:36:10.294150+00:00",
+    "source_file_name": "sample.csv",
+    "source_file_path": ".data\\dynamic_dashboard_py\\uploads\\ds_e6101dd52a1849bca15338b7296187e3.csv",
+    "row_count": 2,
+    "columns": [
+      "order_id",
+      "customer_id",
+      "price",
+      "quantity",
+      "order_date"
+    ],
+    "schema": [
+      {
+        "name": "order_id",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.5
+        }
+      },
+      {
+        "name": "customer_id",
+        "inferred_type": "text",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "price",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "quantity",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.5
+        }
+      },
+      {
+        "name": "order_date",
+        "inferred_type": "datetime",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      }
+    ],
+    "roles": {
+      "customer_id": {
+        "column": "customer_id",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "order_id": {
+        "column": "order_id",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "order_id",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "product_id": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "order_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "price",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "category": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "order_id",
+            "confidence": 0.15
+          },
+          {
+            "column": "price",
+            "confidence": 0.15
+          }
+        ]
+      },
+      "revenue": {
+        "column": "price",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "price",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "quantity": {
+        "column": "quantity",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "quantity",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "timestamp": {
+        "column": "order_date",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "order_date",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "payment_method": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "order_id",
+            "confidence": 0.15
+          },
+          {
+            "column": "price",
+            "confidence": 0.15
+          }
+        ]
+      },
+      "return_status": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "order_id",
+            "confidence": 0.15
+          },
+          {
+            "column": "price",
+            "confidence": 0.15
+          }
+        ]
+      },
+      "refund_amount": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "order_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "price",
+            "confidence": 0.35
+          },
+          {
+            "column": "quantity",
+            "confidence": 0.35
+          }
+        ]
+      }
+    },
+    "profile": {
+      "row_count": 2,
+      "column_count": 5,
+      "summary_stats": {
+        "order_id": {
+          "mean": 1.5,
+          "median": 1.5,
+          "std": 0.5,
+          "min": 1.0,
+          "max": 2.0
+        },
+        "price": {
+          "mean": 15.0,
+          "median": 15.0,
+          "std": 5.0,
+          "min": 10.0,
+          "max": 20.0
+        },
+        "quantity": {
+          "mean": 1.5,
+          "median": 1.5,
+          "std": 0.5,
+          "min": 1.0,
+          "max": 2.0
+        }
+      },
+      "missing_values": {
+        "order_id": 0.0,
+        "customer_id": 0.0,
+        "price": 0.0,
+        "quantity": 0.0,
+        "order_date": 0.0
+      },
+      "unique_counts": {
+        "order_id": 2,
+        "customer_id": 2,
+        "price": 2,
+        "quantity": 2,
+        "order_date": 2
+      },
+      "correlation_matrix": {
+        "order_id": {
+          "order_id": 1.0,
+          "price": 1.0,
+          "quantity": -1.0
+        },
+        "price": {
+          "order_id": 1.0,
+          "price": 1.0,
+          "quantity": -1.0
+        },
+        "quantity": {
+          "order_id": -1.0,
+          "price": -1.0,
+          "quantity": 1.0
+        }
+      },
+      "top_categories": {}
+    },
+    "modules": {
+      "kpis": {
+        "enabled": true,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": "price"
+        }
+      },
+      "time_series": {
+        "enabled": true,
+        "required": [
+          "timestamp",
+          "revenue"
+        ],
+        "detected": {
+          "timestamp": "order_date",
+          "revenue": "price"
+        }
+      },
+      "revenue_by_category": {
+        "enabled": false,
+        "required": [
+          "category",
+          "revenue"
+        ],
+        "detected": {
+          "category": null,
+          "revenue": "price"
+        }
+      },
+      "payment_analysis": {
+        "enabled": false,
+        "required": [
+          "payment_method",
+          "revenue"
+        ],
+        "detected": {
+          "payment_method": null,
+          "revenue": "price"
+        }
+      },
+      "returns": {
+        "enabled": false,
+        "required": [
+          "return_status"
+        ],
+        "detected": {
+          "return_status": null
+        }
+      },
+      "purchase_frequency": {
+        "enabled": true,
+        "required": [
+          "customer_id"
+        ],
+        "detected": {
+          "customer_id": "customer_id"
+        }
+      },
+      "segmentation": {
+        "enabled": true,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": "price"
+        }
+      },
+      "customer_segmentation": {
+        "enabled": true,
+        "required": [
+          "customer_id",
+          "revenue",
+          "timestamp"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": "price",
+          "timestamp": "order_date"
+        }
+      },
+      "clv": {
+        "enabled": true,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": "price"
+        }
+      },
+      "recommendations": {
+        "enabled": false,
+        "required": [
+          "product_id"
+        ],
+        "detected": {
+          "product_id": null
+        }
+      },
+      "anomalies": {
+        "enabled": true,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": "price"
+        }
+      }
+    },
+    "tables": {
+      "raw": "raw_ds_e6101dd52a1849bca15338b7296187e3_v1",
+      "clean": "clean_ds_e6101dd52a1849bca15338b7296187e3_v1"
+    }
+  },
+  "ds_d338059571884b49a9e2a7e2ea3d3b7b::v1": {
+    "tenant_id": null,
+    "dataset_id": "ds_d338059571884b49a9e2a7e2ea3d3b7b",
+    "version_id": 1,
+    "created_at": "2026-03-29T10:41:09.950682+00:00",
+    "source_file_name": "E-commerce Customer Behavior - Sheet1.csv",
+    "source_file_path": ".data\\dynamic_dashboard_py\\uploads\\ds_d338059571884b49a9e2a7e2ea3d3b7b.csv",
+    "row_count": 350,
+    "columns": [
+      "customer_id",
+      "gender",
+      "age",
+      "city",
+      "membership_type",
+      "total_spend",
+      "items_purchased",
+      "average_rating",
+      "discount_applied",
+      "days_since_last_purchase",
+      "satisfaction_level"
+    ],
+    "schema": [
+      {
+        "name": "customer_id",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "gender",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.005714285714285714,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "age",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.045714285714285714,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "city",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.017142857142857144,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "membership_type",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.008571428571428572,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "total_spend",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.21714285714285714,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "items_purchased",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.04285714285714286,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "average_rating",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.05714285714285714,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "discount_applied",
+        "inferred_type": "boolean",
+        "null_rate": 0.0,
+        "unique_ratio": 0.005714285714285714,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 1.0
+        }
+      },
+      {
+        "name": "days_since_last_purchase",
+        "inferred_type": "datetime",
+        "null_rate": 0.0,
+        "unique_ratio": 0.15428571428571428,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "satisfaction_level",
+        "inferred_type": "categorical",
+        "null_rate": 0.005714285714285672,
+        "unique_ratio": 0.008620689655172414,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      }
+    ],
+    "roles": {
+      "customer_id": {
+        "column": "customer_id",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "order_id": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "product_id": {
+        "column": null,
+        "confidence": 0.513,
+        "candidates": [
+          {
+            "column": "items_purchased",
+            "confidence": 0.513
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "category": {
+        "column": null,
+        "confidence": 0.443,
+        "candidates": [
+          {
+            "column": "city",
+            "confidence": 0.443
+          },
+          {
+            "column": "membership_type",
+            "confidence": 0.443
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "revenue": {
+        "column": null,
+        "confidence": 0.458,
+        "candidates": [
+          {
+            "column": "total_spend",
+            "confidence": 0.458
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "quantity": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "total_spend",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "timestamp": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "days_since_last_purchase",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.15
+          },
+          {
+            "column": "gender",
+            "confidence": 0.15
+          }
+        ]
+      },
+      "payment_method": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "gender",
+            "confidence": 0.35
+          },
+          {
+            "column": "city",
+            "confidence": 0.35
+          },
+          {
+            "column": "membership_type",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "return_status": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "gender",
+            "confidence": 0.35
+          },
+          {
+            "column": "city",
+            "confidence": 0.35
+          },
+          {
+            "column": "membership_type",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "refund_amount": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "total_spend",
+            "confidence": 0.35
+          }
+        ]
+      }
+    },
+    "profile": {
+      "row_count": 350,
+      "column_count": 11,
+      "summary_stats": {
+        "customer_id": {
+          "mean": 275.5,
+          "median": 275.5,
+          "std": 101.03588471429346,
+          "min": 101.0,
+          "max": 450.0
+        },
+        "age": {
+          "mean": 33.597142857142856,
+          "median": 32.5,
+          "std": 4.863918803027964,
+          "min": 26.0,
+          "max": 43.0
+        },
+        "total_spend": {
+          "mean": 845.3817142857142,
+          "median": 775.2,
+          "std": 361.5410986634514,
+          "min": 410.8,
+          "max": 1520.1
+        },
+        "items_purchased": {
+          "mean": 12.6,
+          "median": 12.0,
+          "std": 4.150043029036825,
+          "min": 7.0,
+          "max": 21.0
+        },
+        "average_rating": {
+          "mean": 4.019142857142858,
+          "median": 4.1,
+          "std": 0.5797086530740934,
+          "min": 3.0,
+          "max": 4.9
+        }
+      },
+      "missing_values": {
+        "customer_id": 0.0,
+        "gender": 0.0,
+        "age": 0.0,
+        "city": 0.0,
+        "membership_type": 0.0,
+        "total_spend": 0.0,
+        "items_purchased": 0.0,
+        "average_rating": 0.0,
+        "discount_applied": 0.0,
+        "days_since_last_purchase": 0.0,
+        "satisfaction_level": 0.005714285714285714
+      },
+      "unique_counts": {
+        "customer_id": 350,
+        "gender": 2,
+        "age": 16,
+        "city": 6,
+        "membership_type": 3,
+        "total_spend": 76,
+        "items_purchased": 15,
+        "average_rating": 20,
+        "discount_applied": 2,
+        "days_since_last_purchase": 54,
+        "satisfaction_level": 3
+      },
+      "correlation_matrix": {
+        "customer_id": {
+          "customer_id": 1.0,
+          "age": 0.0112,
+          "total_spend": -0.0063,
+          "items_purchased": -0.0032,
+          "average_rating": -0.0005
+        },
+        "age": {
+          "customer_id": 0.0112,
+          "age": 1.0,
+          "total_spend": -0.6779,
+          "items_purchased": -0.6853,
+          "average_rating": -0.7223
+        },
+        "total_spend": {
+          "customer_id": -0.0063,
+          "age": -0.6779,
+          "total_spend": 1.0,
+          "items_purchased": 0.9724,
+          "average_rating": 0.9415
+        },
+        "items_purchased": {
+          "customer_id": -0.0032,
+          "age": -0.6853,
+          "total_spend": 0.9724,
+          "items_purchased": 1.0,
+          "average_rating": 0.922
+        },
+        "average_rating": {
+          "customer_id": -0.0005,
+          "age": -0.7223,
+          "total_spend": 0.9415,
+          "items_purchased": 0.922,
+          "average_rating": 1.0
+        }
+      },
+      "top_categories": {
+        "gender": [
+          {
+            "value": "Female",
+            "count": 175
+          },
+          {
+            "value": "Male",
+            "count": 175
+          }
+        ],
+        "city": [
+          {
+            "value": "New York",
+            "count": 59
+          },
+          {
+            "value": "Los Angeles",
+            "count": 59
+          },
+          {
+            "value": "Chicago",
+            "count": 58
+          },
+          {
+            "value": "San Francisco",
+            "count": 58
+          },
+          {
+            "value": "Miami",
+            "count": 58
+          },
+          {
+            "value": "Houston",
+            "count": 58
+          }
+        ],
+        "membership_type": [
+          {
+            "value": "Gold",
+            "count": 117
+          },
+          {
+            "value": "Silver",
+            "count": 117
+          },
+          {
+            "value": "Bronze",
+            "count": 116
+          }
+        ],
+        "satisfaction_level": [
+          {
+            "value": "Satisfied",
+            "count": 125
+          },
+          {
+            "value": "Unsatisfied",
+            "count": 116
+          },
+          {
+            "value": "Neutral",
+            "count": 107
+          },
+          {
+            "value": "None",
+            "count": 2
+          }
+        ]
+      }
+    },
+    "modules": {
+      "kpis": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      },
+      "time_series": {
+        "enabled": false,
+        "required": [
+          "timestamp",
+          "revenue"
+        ],
+        "detected": {
+          "timestamp": null,
+          "revenue": null
+        }
+      },
+      "revenue_by_category": {
+        "enabled": false,
+        "required": [
+          "category",
+          "revenue"
+        ],
+        "detected": {
+          "category": null,
+          "revenue": null
+        }
+      },
+      "payment_analysis": {
+        "enabled": false,
+        "required": [
+          "payment_method",
+          "revenue"
+        ],
+        "detected": {
+          "payment_method": null,
+          "revenue": null
+        }
+      },
+      "returns": {
+        "enabled": false,
+        "required": [
+          "return_status"
+        ],
+        "detected": {
+          "return_status": null
+        }
+      },
+      "purchase_frequency": {
+        "enabled": true,
+        "required": [
+          "customer_id"
+        ],
+        "detected": {
+          "customer_id": "customer_id"
+        }
+      },
+      "segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "customer_segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue",
+          "timestamp"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null,
+          "timestamp": null
+        }
+      },
+      "clv": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "recommendations": {
+        "enabled": false,
+        "required": [
+          "product_id"
+        ],
+        "detected": {
+          "product_id": null
+        }
+      },
+      "anomalies": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      }
+    },
+    "tables": {
+      "raw": "raw_ds_d338059571884b49a9e2a7e2ea3d3b7b_v1",
+      "clean": "clean_ds_d338059571884b49a9e2a7e2ea3d3b7b_v1"
+    }
+  },
+  "ds_2a5acfa332b54be8b276d3e3a3a8d04f::v1": {
+    "tenant_id": null,
+    "dataset_id": "ds_2a5acfa332b54be8b276d3e3a3a8d04f",
+    "version_id": 1,
+    "created_at": "2026-03-29T10:41:45.927307+00:00",
+    "source_file_name": "ecommerce_customer_data_custom_ratios.csv",
+    "source_file_path": ".data\\dynamic_dashboard_py\\uploads\\ds_2a5acfa332b54be8b276d3e3a3a8d04f.csv",
+    "row_count": 250000,
+    "columns": [
+      "customer_id",
+      "purchase_date",
+      "product_category",
+      "product_price",
+      "quantity",
+      "total_purchase_amount",
+      "payment_method",
+      "customer_age",
+      "returns",
+      "customer_name",
+      "age",
+      "gender",
+      "churn"
+    ],
+    "schema": [
+      {
+        "name": "customer_id",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.9795,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "purchase_date",
+        "inferred_type": "datetime",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "product_category",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.002,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "product_price",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.2415,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "quantity",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.0025,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.195
+        }
+      },
+      {
+        "name": "total_purchase_amount",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.827,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "payment_method",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.002,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "customer_age",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.0265,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "returns",
+        "inferred_type": "numerical",
+        "null_rate": 0.1795,
+        "unique_ratio": 0.001218769043266301,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "customer_name",
+        "inferred_type": "text",
+        "null_rate": 0.0,
+        "unique_ratio": 0.9645,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "age",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.0265,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "gender",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.001,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "churn",
+        "inferred_type": "boolean",
+        "null_rate": 0.0,
+        "unique_ratio": 0.001,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 1.0
+        }
+      }
+    ],
+    "roles": {
+      "customer_id": {
+        "column": "customer_id",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "order_id": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "product_category",
+            "confidence": 0.35
+          },
+          {
+            "column": "product_price",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "product_id": {
+        "column": null,
+        "confidence": 0.513,
+        "candidates": [
+          {
+            "column": "product_category",
+            "confidence": 0.513
+          },
+          {
+            "column": "product_price",
+            "confidence": 0.513
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "category": {
+        "column": null,
+        "confidence": 0.443,
+        "candidates": [
+          {
+            "column": "product_category",
+            "confidence": 0.443
+          },
+          {
+            "column": "payment_method",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_name",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "revenue": {
+        "column": null,
+        "confidence": 0.567,
+        "candidates": [
+          {
+            "column": "total_purchase_amount",
+            "confidence": 0.567
+          },
+          {
+            "column": "product_price",
+            "confidence": 0.458
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "quantity": {
+        "column": "quantity",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "quantity",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "timestamp": {
+        "column": null,
+        "confidence": 0.48,
+        "candidates": [
+          {
+            "column": "purchase_date",
+            "confidence": 0.48
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.15
+          },
+          {
+            "column": "product_category",
+            "confidence": 0.15
+          }
+        ]
+      },
+      "payment_method": {
+        "column": "payment_method",
+        "confidence": 0.675,
+        "candidates": [
+          {
+            "column": "payment_method",
+            "confidence": 0.675
+          },
+          {
+            "column": "product_category",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_name",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "return_status": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "product_category",
+            "confidence": 0.35
+          },
+          {
+            "column": "payment_method",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_name",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "refund_amount": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "product_price",
+            "confidence": 0.35
+          },
+          {
+            "column": "quantity",
+            "confidence": 0.35
+          }
+        ]
+      }
+    },
+    "profile": {
+      "row_count": 2000,
+      "column_count": 13,
+      "summary_stats": {
+        "customer_id": {
+          "mean": 25338.4765,
+          "median": 25474.0,
+          "std": 14521.201011915226,
+          "min": 5.0,
+          "max": 49997.0
+        },
+        "product_price": {
+          "mean": 257.4365,
+          "median": 259.0,
+          "std": 141.72136030870575,
+          "min": 10.0,
+          "max": 500.0
+        },
+        "quantity": {
+          "mean": 3.0185,
+          "median": 3.0,
+          "std": 1.4163889825891758,
+          "min": 1.0,
+          "max": 5.0
+        },
+        "total_purchase_amount": {
+          "mean": 2713.6205,
+          "median": 2696.5,
+          "std": 1449.7782552789754,
+          "min": 133.0,
+          "max": 5326.0
+        },
+        "customer_age": {
+          "mean": 43.8805,
+          "median": 44.0,
+          "std": 15.572900171451687,
+          "min": 18.0,
+          "max": 70.0
+        },
+        "returns": {
+          "mean": 0.5051797684338818,
+          "median": 1.0,
+          "std": 0.49997316927908375,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "age": {
+          "mean": 43.8805,
+          "median": 44.0,
+          "std": 15.572900171451687,
+          "min": 18.0,
+          "max": 70.0
+        }
+      },
+      "missing_values": {
+        "customer_id": 0.0,
+        "purchase_date": 0.0,
+        "product_category": 0.0,
+        "product_price": 0.0,
+        "quantity": 0.0,
+        "total_purchase_amount": 0.0,
+        "payment_method": 0.0,
+        "customer_age": 0.0,
+        "returns": 0.1795,
+        "customer_name": 0.0,
+        "age": 0.0,
+        "gender": 0.0,
+        "churn": 0.0
+      },
+      "unique_counts": {
+        "customer_id": 1959,
+        "purchase_date": 2000,
+        "product_category": 4,
+        "product_price": 483,
+        "quantity": 5,
+        "total_purchase_amount": 1654,
+        "payment_method": 4,
+        "customer_age": 53,
+        "returns": 2,
+        "customer_name": 1929,
+        "age": 53,
+        "gender": 2,
+        "churn": 2
+      },
+      "correlation_matrix": {
+        "customer_id": {
+          "customer_id": 1.0,
+          "product_price": -0.0187,
+          "quantity": -0.0411,
+          "total_purchase_amount": 0.0129,
+          "customer_age": 0.0156,
+          "returns": -0.0168,
+          "age": 0.0156
+        },
+        "product_price": {
+          "customer_id": -0.0187,
+          "product_price": 1.0,
+          "quantity": -0.0321,
+          "total_purchase_amount": -0.0143,
+          "customer_age": -0.0105,
+          "returns": -0.0506,
+          "age": -0.0105
+        },
+        "quantity": {
+          "customer_id": -0.0411,
+          "product_price": -0.0321,
+          "quantity": 1.0,
+          "total_purchase_amount": -0.0207,
+          "customer_age": -0.0176,
+          "returns": 0.012,
+          "age": -0.0176
+        },
+        "total_purchase_amount": {
+          "customer_id": 0.0129,
+          "product_price": -0.0143,
+          "quantity": -0.0207,
+          "total_purchase_amount": 1.0,
+          "customer_age": 0.0254,
+          "returns": -0.0363,
+          "age": 0.0254
+        },
+        "customer_age": {
+          "customer_id": 0.0156,
+          "product_price": -0.0105,
+          "quantity": -0.0176,
+          "total_purchase_amount": 0.0254,
+          "customer_age": 1.0,
+          "returns": 0.0118,
+          "age": 1.0
+        },
+        "returns": {
+          "customer_id": -0.0168,
+          "product_price": -0.0506,
+          "quantity": 0.012,
+          "total_purchase_amount": -0.0363,
+          "customer_age": 0.0118,
+          "returns": 1.0,
+          "age": 0.0118
+        },
+        "age": {
+          "customer_id": 0.0156,
+          "product_price": -0.0105,
+          "quantity": -0.0176,
+          "total_purchase_amount": 0.0254,
+          "customer_age": 1.0,
+          "returns": 0.0118,
+          "age": 1.0
+        }
+      },
+      "top_categories": {
+        "product_category": [
+          {
+            "value": "Books",
+            "count": 587
+          },
+          {
+            "value": "Clothing",
+            "count": 564
+          },
+          {
+            "value": "Electronics",
+            "count": 441
+          },
+          {
+            "value": "Home",
+            "count": 408
+          }
+        ],
+        "payment_method": [
+          {
+            "value": "Credit Card",
+            "count": 834
+          },
+          {
+            "value": "PayPal",
+            "count": 590
+          },
+          {
+            "value": "Cash",
+            "count": 379
+          },
+          {
+            "value": "Crypto",
+            "count": 197
+          }
+        ],
+        "gender": [
+          {
+            "value": "Female",
+            "count": 1007
+          },
+          {
+            "value": "Male",
+            "count": 993
+          }
+        ]
+      }
+    },
+    "modules": {
+      "kpis": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      },
+      "time_series": {
+        "enabled": false,
+        "required": [
+          "timestamp",
+          "revenue"
+        ],
+        "detected": {
+          "timestamp": null,
+          "revenue": null
+        }
+      },
+      "revenue_by_category": {
+        "enabled": false,
+        "required": [
+          "category",
+          "revenue"
+        ],
+        "detected": {
+          "category": null,
+          "revenue": null
+        }
+      },
+      "payment_analysis": {
+        "enabled": false,
+        "required": [
+          "payment_method",
+          "revenue"
+        ],
+        "detected": {
+          "payment_method": "payment_method",
+          "revenue": null
+        }
+      },
+      "returns": {
+        "enabled": false,
+        "required": [
+          "return_status"
+        ],
+        "detected": {
+          "return_status": null
+        }
+      },
+      "purchase_frequency": {
+        "enabled": true,
+        "required": [
+          "customer_id"
+        ],
+        "detected": {
+          "customer_id": "customer_id"
+        }
+      },
+      "segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "customer_segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue",
+          "timestamp"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null,
+          "timestamp": null
+        }
+      },
+      "clv": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "recommendations": {
+        "enabled": false,
+        "required": [
+          "product_id"
+        ],
+        "detected": {
+          "product_id": null
+        }
+      },
+      "anomalies": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      }
+    },
+    "tables": {
+      "raw": "raw_ds_2a5acfa332b54be8b276d3e3a3a8d04f_v1",
+      "clean": "clean_ds_2a5acfa332b54be8b276d3e3a3a8d04f_v1"
+    }
+  },
+  "ds_4b70b2ce6378415b9fd8b1d13236ac03::v1": {
+    "tenant_id": null,
+    "dataset_id": "ds_4b70b2ce6378415b9fd8b1d13236ac03",
+    "version_id": 1,
+    "created_at": "2026-03-29T10:42:54.597251+00:00",
+    "source_file_name": "Ecommerce_Consumer_Behavior_Analysis_Data.csv",
+    "source_file_path": ".data\\dynamic_dashboard_py\\uploads\\ds_4b70b2ce6378415b9fd8b1d13236ac03.csv",
+    "row_count": 1000,
+    "columns": [
+      "customer_id",
+      "age",
+      "gender",
+      "income_level",
+      "marital_status",
+      "education_level",
+      "occupation",
+      "location",
+      "purchase_category",
+      "purchase_amount",
+      "frequency_of_purchase",
+      "purchase_channel",
+      "brand_loyalty",
+      "product_rating",
+      "time_spent_on_product_research_hours",
+      "social_media_influence",
+      "discount_sensitivity",
+      "return_rate",
+      "customer_satisfaction",
+      "engagement_with_ads",
+      "device_used_for_shopping",
+      "payment_method",
+      "time_of_purchase",
+      "discount_used",
+      "customer_loyalty_program_member",
+      "purchase_intent",
+      "shipping_preference",
+      "time_to_decision"
+    ],
+    "schema": [
+      {
+        "name": "customer_id",
+        "inferred_type": "text",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "age",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.033,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "gender",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.008,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "income_level",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.002,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "marital_status",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.004,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "education_level",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.003,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "occupation",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.002,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "location",
+        "inferred_type": "text",
+        "null_rate": 0.0,
+        "unique_ratio": 0.969,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "purchase_category",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.024,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "purchase_amount",
+        "inferred_type": "text",
+        "null_rate": 0.0,
+        "unique_ratio": 0.989,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "frequency_of_purchase",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.011,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "purchase_channel",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.003,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "brand_loyalty",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.005,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.196
+        }
+      },
+      {
+        "name": "product_rating",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.005,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.205
+        }
+      },
+      {
+        "name": "time_spent_on_product_research_hours",
+        "inferred_type": "datetime",
+        "null_rate": 0.0,
+        "unique_ratio": 0.012,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "social_media_influence",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.004,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "discount_sensitivity",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.003,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "return_rate",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.003,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.694
+        }
+      },
+      {
+        "name": "customer_satisfaction",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.01,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.111
+        }
+      },
+      {
+        "name": "engagement_with_ads",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.004,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "device_used_for_shopping",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.003,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "payment_method",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.005,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "time_of_purchase",
+        "inferred_type": "datetime",
+        "null_rate": 0.0,
+        "unique_ratio": 0.344,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "discount_used",
+        "inferred_type": "boolean",
+        "null_rate": 0.0,
+        "unique_ratio": 0.002,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 1.0
+        }
+      },
+      {
+        "name": "customer_loyalty_program_member",
+        "inferred_type": "boolean",
+        "null_rate": 0.0,
+        "unique_ratio": 0.002,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 1.0
+        }
+      },
+      {
+        "name": "purchase_intent",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.004,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "shipping_preference",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.003,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "time_to_decision",
+        "inferred_type": "datetime",
+        "null_rate": 0.0,
+        "unique_ratio": 0.014,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.086
+        }
+      }
+    ],
+    "roles": {
+      "customer_id": {
+        "column": "customer_id",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "order_id": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "product_id": {
+        "column": null,
+        "confidence": 0.513,
+        "candidates": [
+          {
+            "column": "product_rating",
+            "confidence": 0.513
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "category": {
+        "column": null,
+        "confidence": 0.443,
+        "candidates": [
+          {
+            "column": "location",
+            "confidence": 0.443
+          },
+          {
+            "column": "purchase_category",
+            "confidence": 0.443
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "revenue": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "frequency_of_purchase",
+            "confidence": 0.35
+          },
+          {
+            "column": "brand_loyalty",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "quantity": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "frequency_of_purchase",
+            "confidence": 0.35
+          },
+          {
+            "column": "brand_loyalty",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "timestamp": {
+        "column": null,
+        "confidence": 0.48,
+        "candidates": [
+          {
+            "column": "time_spent_on_product_research_hours",
+            "confidence": 0.48
+          },
+          {
+            "column": "time_of_purchase",
+            "confidence": 0.48
+          },
+          {
+            "column": "time_to_decision",
+            "confidence": 0.48
+          }
+        ]
+      },
+      "payment_method": {
+        "column": "payment_method",
+        "confidence": 0.675,
+        "candidates": [
+          {
+            "column": "payment_method",
+            "confidence": 0.675
+          },
+          {
+            "column": "purchase_channel",
+            "confidence": 0.513
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "return_status": {
+        "column": null,
+        "confidence": 0.367,
+        "candidates": [
+          {
+            "column": "return_rate",
+            "confidence": 0.367
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "refund_amount": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "frequency_of_purchase",
+            "confidence": 0.35
+          },
+          {
+            "column": "brand_loyalty",
+            "confidence": 0.35
+          }
+        ]
+      }
+    },
+    "profile": {
+      "row_count": 1000,
+      "column_count": 28,
+      "summary_stats": {
+        "age": {
+          "mean": 34.304,
+          "median": 34.5,
+          "std": 9.34856053090528,
+          "min": 18.0,
+          "max": 50.0
+        },
+        "frequency_of_purchase": {
+          "mean": 6.945,
+          "median": 7.0,
+          "std": 3.145786864998962,
+          "min": 2.0,
+          "max": 12.0
+        },
+        "brand_loyalty": {
+          "mean": 3.026,
+          "median": 3.0,
+          "std": 1.416094629606369,
+          "min": 1.0,
+          "max": 5.0
+        },
+        "product_rating": {
+          "mean": 3.033,
+          "median": 3.0,
+          "std": 1.435935583513411,
+          "min": 1.0,
+          "max": 5.0
+        },
+        "return_rate": {
+          "mean": 0.954,
+          "median": 1.0,
+          "std": 0.809866655690923,
+          "min": 0.0,
+          "max": 2.0
+        },
+        "customer_satisfaction": {
+          "mean": 5.399,
+          "median": 5.0,
+          "std": 2.8670191837516534,
+          "min": 1.0,
+          "max": 10.0
+        }
+      },
+      "missing_values": {
+        "customer_id": 0.0,
+        "age": 0.0,
+        "gender": 0.0,
+        "income_level": 0.0,
+        "marital_status": 0.0,
+        "education_level": 0.0,
+        "occupation": 0.0,
+        "location": 0.0,
+        "purchase_category": 0.0,
+        "purchase_amount": 0.0,
+        "frequency_of_purchase": 0.0,
+        "purchase_channel": 0.0,
+        "brand_loyalty": 0.0,
+        "product_rating": 0.0,
+        "time_spent_on_product_research_hours": 0.0,
+        "social_media_influence": 0.0,
+        "discount_sensitivity": 0.0,
+        "return_rate": 0.0,
+        "customer_satisfaction": 0.0,
+        "engagement_with_ads": 0.0,
+        "device_used_for_shopping": 0.0,
+        "payment_method": 0.0,
+        "time_of_purchase": 0.0,
+        "discount_used": 0.0,
+        "customer_loyalty_program_member": 0.0,
+        "purchase_intent": 0.0,
+        "shipping_preference": 0.0,
+        "time_to_decision": 0.0
+      },
+      "unique_counts": {
+        "customer_id": 1000,
+        "age": 33,
+        "gender": 8,
+        "income_level": 2,
+        "marital_status": 4,
+        "education_level": 3,
+        "occupation": 2,
+        "location": 969,
+        "purchase_category": 24,
+        "purchase_amount": 989,
+        "frequency_of_purchase": 11,
+        "purchase_channel": 3,
+        "brand_loyalty": 5,
+        "product_rating": 5,
+        "time_spent_on_product_research_hours": 12,
+        "social_media_influence": 4,
+        "discount_sensitivity": 3,
+        "return_rate": 3,
+        "customer_satisfaction": 10,
+        "engagement_with_ads": 4,
+        "device_used_for_shopping": 3,
+        "payment_method": 5,
+        "time_of_purchase": 344,
+        "discount_used": 2,
+        "customer_loyalty_program_member": 2,
+        "purchase_intent": 4,
+        "shipping_preference": 3,
+        "time_to_decision": 14
+      },
+      "correlation_matrix": {
+        "age": {
+          "age": 1.0,
+          "frequency_of_purchase": -0.0457,
+          "brand_loyalty": -0.0129,
+          "product_rating": 0.0104,
+          "return_rate": 0.0308,
+          "customer_satisfaction": -0.0042
+        },
+        "frequency_of_purchase": {
+          "age": -0.0457,
+          "frequency_of_purchase": 1.0,
+          "brand_loyalty": 0.0145,
+          "product_rating": -0.0636,
+          "return_rate": -0.0171,
+          "customer_satisfaction": 0.0141
+        },
+        "brand_loyalty": {
+          "age": -0.0129,
+          "frequency_of_purchase": 0.0145,
+          "brand_loyalty": 1.0,
+          "product_rating": -0.0014,
+          "return_rate": 0.0141,
+          "customer_satisfaction": -0.0346
+        },
+        "product_rating": {
+          "age": 0.0104,
+          "frequency_of_purchase": -0.0636,
+          "brand_loyalty": -0.0014,
+          "product_rating": 1.0,
+          "return_rate": 0.0546,
+          "customer_satisfaction": -0.0425
+        },
+        "return_rate": {
+          "age": 0.0308,
+          "frequency_of_purchase": -0.0171,
+          "brand_loyalty": 0.0141,
+          "product_rating": 0.0546,
+          "return_rate": 1.0,
+          "customer_satisfaction": 0.0225
+        },
+        "customer_satisfaction": {
+          "age": -0.0042,
+          "frequency_of_purchase": 0.0141,
+          "brand_loyalty": -0.0346,
+          "product_rating": -0.0425,
+          "return_rate": 0.0225,
+          "customer_satisfaction": 1.0
+        }
+      },
+      "top_categories": {
+        "gender": [
+          {
+            "value": "Female",
+            "count": 452
+          },
+          {
+            "value": "Male",
+            "count": 449
+          },
+          {
+            "value": "Bigender",
+            "count": 20
+          },
+          {
+            "value": "Agender",
+            "count": 19
+          },
+          {
+            "value": "Genderfluid",
+            "count": 17
+          },
+          {
+            "value": "Non-binary",
+            "count": 16
+          },
+          {
+            "value": "Polygender",
+            "count": 15
+          },
+          {
+            "value": "Genderqueer",
+            "count": 12
+          }
+        ],
+        "income_level": [
+          {
+            "value": "High",
+            "count": 515
+          },
+          {
+            "value": "Middle",
+            "count": 485
+          }
+        ],
+        "marital_status": [
+          {
+            "value": "Widowed",
+            "count": 260
+          },
+          {
+            "value": "Married",
+            "count": 253
+          },
+          {
+            "value": "Divorced",
+            "count": 245
+          },
+          {
+            "value": "Single",
+            "count": 242
+          }
+        ],
+        "education_level": [
+          {
+            "value": "Bachelor's",
+            "count": 341
+          },
+          {
+            "value": "High School",
+            "count": 331
+          },
+          {
+            "value": "Master's",
+            "count": 328
+          }
+        ],
+        "occupation": [
+          {
+            "value": "High",
+            "count": 517
+          },
+          {
+            "value": "Middle",
+            "count": 483
+          }
+        ],
+        "purchase_category": [
+          {
+            "value": "Electronics",
+            "count": 54
+          },
+          {
+            "value": "Sports & Outdoors",
+            "count": 51
+          },
+          {
+            "value": "Jewelry & Accessories",
+            "count": 50
+          },
+          {
+            "value": "Home Appliances",
+            "count": 50
+          },
+          {
+            "value": "Toys & Games",
+            "count": 47
+          },
+          {
+            "value": "Animal Feed",
+            "count": 44
+          },
+          {
+            "value": "Food & Beverages",
+            "count": 44
+          },
+          {
+            "value": "Gardening & Outdoors",
+            "count": 44
+          },
+          {
+            "value": "Packages)",
+            "count": 43
+          },
+          {
+            "value": "Software & Apps",
+            "count": 43
+          }
+        ],
+        "purchase_channel": [
+          {
+            "value": "Mixed",
+            "count": 340
+          },
+          {
+            "value": "Online",
+            "count": 334
+          },
+          {
+            "value": "In-Store",
+            "count": 326
+          }
+        ],
+        "social_media_influence": [
+          {
+            "value": "High",
+            "count": 268
+          },
+          {
+            "value": "Low",
+            "count": 249
+          },
+          {
+            "value": "None",
+            "count": 247
+          },
+          {
+            "value": "Medium",
+            "count": 236
+          }
+        ],
+        "discount_sensitivity": [
+          {
+            "value": "Very Sensitive",
+            "count": 350
+          },
+          {
+            "value": "Not Sensitive",
+            "count": 331
+          },
+          {
+            "value": "Somewhat Sensitive",
+            "count": 319
+          }
+        ],
+        "engagement_with_ads": [
+          {
+            "value": "High",
+            "count": 270
+          },
+          {
+            "value": "None",
+            "count": 256
+          },
+          {
+            "value": "Medium",
+            "count": 244
+          },
+          {
+            "value": "Low",
+            "count": 230
+          }
+        ],
+        "device_used_for_shopping": [
+          {
+            "value": "Desktop",
+            "count": 350
+          },
+          {
+            "value": "Tablet",
+            "count": 339
+          },
+          {
+            "value": "Smartphone",
+            "count": 311
+          }
+        ],
+        "payment_method": [
+          {
+            "value": "PayPal",
+            "count": 219
+          },
+          {
+            "value": "Other",
+            "count": 204
+          },
+          {
+            "value": "Debit Card",
+            "count": 196
+          },
+          {
+            "value": "Credit Card",
+            "count": 194
+          },
+          {
+            "value": "Cash",
+            "count": 187
+          }
+        ],
+        "purchase_intent": [
+          {
+            "value": "Need-based",
+            "count": 256
+          },
+          {
+            "value": "Wants-based",
+            "count": 249
+          },
+          {
+            "value": "Impulsive",
+            "count": 248
+          },
+          {
+            "value": "Planned",
+            "count": 247
+          }
+        ],
+        "shipping_preference": [
+          {
+            "value": "No Preference",
+            "count": 372
+          },
+          {
+            "value": "Standard",
+            "count": 334
+          },
+          {
+            "value": "Express",
+            "count": 294
+          }
+        ]
+      }
+    },
+    "modules": {
+      "kpis": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      },
+      "time_series": {
+        "enabled": false,
+        "required": [
+          "timestamp",
+          "revenue"
+        ],
+        "detected": {
+          "timestamp": null,
+          "revenue": null
+        }
+      },
+      "revenue_by_category": {
+        "enabled": false,
+        "required": [
+          "category",
+          "revenue"
+        ],
+        "detected": {
+          "category": null,
+          "revenue": null
+        }
+      },
+      "payment_analysis": {
+        "enabled": false,
+        "required": [
+          "payment_method",
+          "revenue"
+        ],
+        "detected": {
+          "payment_method": "payment_method",
+          "revenue": null
+        }
+      },
+      "returns": {
+        "enabled": false,
+        "required": [
+          "return_status"
+        ],
+        "detected": {
+          "return_status": null
+        }
+      },
+      "purchase_frequency": {
+        "enabled": true,
+        "required": [
+          "customer_id"
+        ],
+        "detected": {
+          "customer_id": "customer_id"
+        }
+      },
+      "segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "customer_segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue",
+          "timestamp"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null,
+          "timestamp": null
+        }
+      },
+      "clv": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "recommendations": {
+        "enabled": false,
+        "required": [
+          "product_id"
+        ],
+        "detected": {
+          "product_id": null
+        }
+      },
+      "anomalies": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      }
+    },
+    "tables": {
+      "raw": "raw_ds_4b70b2ce6378415b9fd8b1d13236ac03_v1",
+      "clean": "clean_ds_4b70b2ce6378415b9fd8b1d13236ac03_v1"
+    }
+  },
+  "ds_ce76e1868d8b4a10ba20c16bfa06de42::v1": {
+    "tenant_id": null,
+    "dataset_id": "ds_ce76e1868d8b4a10ba20c16bfa06de42",
+    "version_id": 1,
+    "created_at": "2026-03-29T10:42:59.433684+00:00",
+    "source_file_name": "E-commerce Customer Behavior - Sheet1.csv",
+    "source_file_path": ".data\\dynamic_dashboard_py\\uploads\\ds_ce76e1868d8b4a10ba20c16bfa06de42.csv",
+    "row_count": 350,
+    "columns": [
+      "customer_id",
+      "gender",
+      "age",
+      "city",
+      "membership_type",
+      "total_spend",
+      "items_purchased",
+      "average_rating",
+      "discount_applied",
+      "days_since_last_purchase",
+      "satisfaction_level"
+    ],
+    "schema": [
+      {
+        "name": "customer_id",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "gender",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.005714285714285714,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "age",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.045714285714285714,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "city",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.017142857142857144,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "membership_type",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.008571428571428572,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "total_spend",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.21714285714285714,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "items_purchased",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.04285714285714286,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "average_rating",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.05714285714285714,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "discount_applied",
+        "inferred_type": "boolean",
+        "null_rate": 0.0,
+        "unique_ratio": 0.005714285714285714,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 1.0
+        }
+      },
+      {
+        "name": "days_since_last_purchase",
+        "inferred_type": "datetime",
+        "null_rate": 0.0,
+        "unique_ratio": 0.15428571428571428,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "satisfaction_level",
+        "inferred_type": "categorical",
+        "null_rate": 0.005714285714285672,
+        "unique_ratio": 0.008620689655172414,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      }
+    ],
+    "roles": {
+      "customer_id": {
+        "column": "customer_id",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "order_id": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "product_id": {
+        "column": null,
+        "confidence": 0.513,
+        "candidates": [
+          {
+            "column": "items_purchased",
+            "confidence": 0.513
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "category": {
+        "column": null,
+        "confidence": 0.443,
+        "candidates": [
+          {
+            "column": "city",
+            "confidence": 0.443
+          },
+          {
+            "column": "membership_type",
+            "confidence": 0.443
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "revenue": {
+        "column": null,
+        "confidence": 0.458,
+        "candidates": [
+          {
+            "column": "total_spend",
+            "confidence": 0.458
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "quantity": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "total_spend",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "timestamp": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "days_since_last_purchase",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.15
+          },
+          {
+            "column": "gender",
+            "confidence": 0.15
+          }
+        ]
+      },
+      "payment_method": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "gender",
+            "confidence": 0.35
+          },
+          {
+            "column": "city",
+            "confidence": 0.35
+          },
+          {
+            "column": "membership_type",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "return_status": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "gender",
+            "confidence": 0.35
+          },
+          {
+            "column": "city",
+            "confidence": 0.35
+          },
+          {
+            "column": "membership_type",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "refund_amount": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "total_spend",
+            "confidence": 0.35
+          }
+        ]
+      }
+    },
+    "profile": {
+      "row_count": 350,
+      "column_count": 11,
+      "summary_stats": {
+        "customer_id": {
+          "mean": 275.5,
+          "median": 275.5,
+          "std": 101.03588471429346,
+          "min": 101.0,
+          "max": 450.0
+        },
+        "age": {
+          "mean": 33.597142857142856,
+          "median": 32.5,
+          "std": 4.863918803027964,
+          "min": 26.0,
+          "max": 43.0
+        },
+        "total_spend": {
+          "mean": 845.3817142857142,
+          "median": 775.2,
+          "std": 361.5410986634514,
+          "min": 410.8,
+          "max": 1520.1
+        },
+        "items_purchased": {
+          "mean": 12.6,
+          "median": 12.0,
+          "std": 4.150043029036825,
+          "min": 7.0,
+          "max": 21.0
+        },
+        "average_rating": {
+          "mean": 4.019142857142858,
+          "median": 4.1,
+          "std": 0.5797086530740934,
+          "min": 3.0,
+          "max": 4.9
+        }
+      },
+      "missing_values": {
+        "customer_id": 0.0,
+        "gender": 0.0,
+        "age": 0.0,
+        "city": 0.0,
+        "membership_type": 0.0,
+        "total_spend": 0.0,
+        "items_purchased": 0.0,
+        "average_rating": 0.0,
+        "discount_applied": 0.0,
+        "days_since_last_purchase": 0.0,
+        "satisfaction_level": 0.005714285714285714
+      },
+      "unique_counts": {
+        "customer_id": 350,
+        "gender": 2,
+        "age": 16,
+        "city": 6,
+        "membership_type": 3,
+        "total_spend": 76,
+        "items_purchased": 15,
+        "average_rating": 20,
+        "discount_applied": 2,
+        "days_since_last_purchase": 54,
+        "satisfaction_level": 3
+      },
+      "correlation_matrix": {
+        "customer_id": {
+          "customer_id": 1.0,
+          "age": 0.0112,
+          "total_spend": -0.0063,
+          "items_purchased": -0.0032,
+          "average_rating": -0.0005
+        },
+        "age": {
+          "customer_id": 0.0112,
+          "age": 1.0,
+          "total_spend": -0.6779,
+          "items_purchased": -0.6853,
+          "average_rating": -0.7223
+        },
+        "total_spend": {
+          "customer_id": -0.0063,
+          "age": -0.6779,
+          "total_spend": 1.0,
+          "items_purchased": 0.9724,
+          "average_rating": 0.9415
+        },
+        "items_purchased": {
+          "customer_id": -0.0032,
+          "age": -0.6853,
+          "total_spend": 0.9724,
+          "items_purchased": 1.0,
+          "average_rating": 0.922
+        },
+        "average_rating": {
+          "customer_id": -0.0005,
+          "age": -0.7223,
+          "total_spend": 0.9415,
+          "items_purchased": 0.922,
+          "average_rating": 1.0
+        }
+      },
+      "top_categories": {
+        "gender": [
+          {
+            "value": "Female",
+            "count": 175
+          },
+          {
+            "value": "Male",
+            "count": 175
+          }
+        ],
+        "city": [
+          {
+            "value": "New York",
+            "count": 59
+          },
+          {
+            "value": "Los Angeles",
+            "count": 59
+          },
+          {
+            "value": "Chicago",
+            "count": 58
+          },
+          {
+            "value": "San Francisco",
+            "count": 58
+          },
+          {
+            "value": "Miami",
+            "count": 58
+          },
+          {
+            "value": "Houston",
+            "count": 58
+          }
+        ],
+        "membership_type": [
+          {
+            "value": "Gold",
+            "count": 117
+          },
+          {
+            "value": "Silver",
+            "count": 117
+          },
+          {
+            "value": "Bronze",
+            "count": 116
+          }
+        ],
+        "satisfaction_level": [
+          {
+            "value": "Satisfied",
+            "count": 125
+          },
+          {
+            "value": "Unsatisfied",
+            "count": 116
+          },
+          {
+            "value": "Neutral",
+            "count": 107
+          },
+          {
+            "value": "None",
+            "count": 2
+          }
+        ]
+      }
+    },
+    "modules": {
+      "kpis": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      },
+      "time_series": {
+        "enabled": false,
+        "required": [
+          "timestamp",
+          "revenue"
+        ],
+        "detected": {
+          "timestamp": null,
+          "revenue": null
+        }
+      },
+      "revenue_by_category": {
+        "enabled": false,
+        "required": [
+          "category",
+          "revenue"
+        ],
+        "detected": {
+          "category": null,
+          "revenue": null
+        }
+      },
+      "payment_analysis": {
+        "enabled": false,
+        "required": [
+          "payment_method",
+          "revenue"
+        ],
+        "detected": {
+          "payment_method": null,
+          "revenue": null
+        }
+      },
+      "returns": {
+        "enabled": false,
+        "required": [
+          "return_status"
+        ],
+        "detected": {
+          "return_status": null
+        }
+      },
+      "purchase_frequency": {
+        "enabled": true,
+        "required": [
+          "customer_id"
+        ],
+        "detected": {
+          "customer_id": "customer_id"
+        }
+      },
+      "segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "customer_segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue",
+          "timestamp"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null,
+          "timestamp": null
+        }
+      },
+      "clv": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "recommendations": {
+        "enabled": false,
+        "required": [
+          "product_id"
+        ],
+        "detected": {
+          "product_id": null
+        }
+      },
+      "anomalies": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      }
+    },
+    "tables": {
+      "raw": "raw_ds_ce76e1868d8b4a10ba20c16bfa06de42_v1",
+      "clean": "clean_ds_ce76e1868d8b4a10ba20c16bfa06de42_v1"
+    }
+  },
+  "ds_6de4b0a27b774114907016bebcc1e628::v1": {
+    "tenant_id": null,
+    "dataset_id": "ds_6de4b0a27b774114907016bebcc1e628",
+    "version_id": 1,
+    "created_at": "2026-03-29T10:43:18.719364+00:00",
+    "source_file_name": "ecommerce_customer_data_custom_ratios.csv",
+    "source_file_path": ".data\\dynamic_dashboard_py\\uploads\\ds_6de4b0a27b774114907016bebcc1e628.csv",
+    "row_count": 250000,
+    "columns": [
+      "customer_id",
+      "purchase_date",
+      "product_category",
+      "product_price",
+      "quantity",
+      "total_purchase_amount",
+      "payment_method",
+      "customer_age",
+      "returns",
+      "customer_name",
+      "age",
+      "gender",
+      "churn"
+    ],
+    "schema": [
+      {
+        "name": "customer_id",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.9825,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "purchase_date",
+        "inferred_type": "datetime",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "product_category",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.002,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "product_price",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.242,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "quantity",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.0025,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.1955
+        }
+      },
+      {
+        "name": "total_purchase_amount",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.837,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "payment_method",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.002,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "customer_age",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.0265,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "returns",
+        "inferred_type": "numerical",
+        "null_rate": 0.18799999999999994,
+        "unique_ratio": 0.0012315270935960591,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "customer_name",
+        "inferred_type": "text",
+        "null_rate": 0.0,
+        "unique_ratio": 0.97,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "age",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.0265,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "gender",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.001,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "churn",
+        "inferred_type": "boolean",
+        "null_rate": 0.0,
+        "unique_ratio": 0.001,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 1.0
+        }
+      }
+    ],
+    "roles": {
+      "customer_id": {
+        "column": "customer_id",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "order_id": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "product_category",
+            "confidence": 0.35
+          },
+          {
+            "column": "product_price",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "product_id": {
+        "column": null,
+        "confidence": 0.513,
+        "candidates": [
+          {
+            "column": "product_category",
+            "confidence": 0.513
+          },
+          {
+            "column": "product_price",
+            "confidence": 0.513
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "category": {
+        "column": null,
+        "confidence": 0.443,
+        "candidates": [
+          {
+            "column": "product_category",
+            "confidence": 0.443
+          },
+          {
+            "column": "payment_method",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_name",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "revenue": {
+        "column": null,
+        "confidence": 0.567,
+        "candidates": [
+          {
+            "column": "total_purchase_amount",
+            "confidence": 0.567
+          },
+          {
+            "column": "product_price",
+            "confidence": 0.458
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "quantity": {
+        "column": "quantity",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "quantity",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "timestamp": {
+        "column": null,
+        "confidence": 0.48,
+        "candidates": [
+          {
+            "column": "purchase_date",
+            "confidence": 0.48
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.15
+          },
+          {
+            "column": "product_category",
+            "confidence": 0.15
+          }
+        ]
+      },
+      "payment_method": {
+        "column": "payment_method",
+        "confidence": 0.675,
+        "candidates": [
+          {
+            "column": "payment_method",
+            "confidence": 0.675
+          },
+          {
+            "column": "product_category",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_name",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "return_status": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "product_category",
+            "confidence": 0.35
+          },
+          {
+            "column": "payment_method",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_name",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "refund_amount": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "product_price",
+            "confidence": 0.35
+          },
+          {
+            "column": "quantity",
+            "confidence": 0.35
+          }
+        ]
+      }
+    },
+    "profile": {
+      "row_count": 2000,
+      "column_count": 13,
+      "summary_stats": {
+        "customer_id": {
+          "mean": 25143.4875,
+          "median": 25525.0,
+          "std": 14316.88893285981,
+          "min": 13.0,
+          "max": 49994.0
+        },
+        "product_price": {
+          "mean": 255.566,
+          "median": 252.0,
+          "std": 140.9181558352223,
+          "min": 10.0,
+          "max": 500.0
+        },
+        "quantity": {
+          "mean": 3.0235,
+          "median": 3.0,
+          "std": 1.412426192761944,
+          "min": 1.0,
+          "max": 5.0
+        },
+        "total_purchase_amount": {
+          "mean": 2743.826,
+          "median": 2754.0,
+          "std": 1462.3042527887278,
+          "min": 138.0,
+          "max": 5310.0
+        },
+        "customer_age": {
+          "mean": 43.6525,
+          "median": 43.0,
+          "std": 15.550297223847522,
+          "min": 18.0,
+          "max": 70.0
+        },
+        "returns": {
+          "mean": 0.48645320197044334,
+          "median": 0.0,
+          "std": 0.49981645057275426,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "age": {
+          "mean": 43.6525,
+          "median": 43.0,
+          "std": 15.550297223847522,
+          "min": 18.0,
+          "max": 70.0
+        }
+      },
+      "missing_values": {
+        "customer_id": 0.0,
+        "purchase_date": 0.0,
+        "product_category": 0.0,
+        "product_price": 0.0,
+        "quantity": 0.0,
+        "total_purchase_amount": 0.0,
+        "payment_method": 0.0,
+        "customer_age": 0.0,
+        "returns": 0.188,
+        "customer_name": 0.0,
+        "age": 0.0,
+        "gender": 0.0,
+        "churn": 0.0
+      },
+      "unique_counts": {
+        "customer_id": 1965,
+        "purchase_date": 2000,
+        "product_category": 4,
+        "product_price": 484,
+        "quantity": 5,
+        "total_purchase_amount": 1674,
+        "payment_method": 4,
+        "customer_age": 53,
+        "returns": 2,
+        "customer_name": 1940,
+        "age": 53,
+        "gender": 2,
+        "churn": 2
+      },
+      "correlation_matrix": {
+        "customer_id": {
+          "customer_id": 1.0,
+          "product_price": -0.002,
+          "quantity": 0.0145,
+          "total_purchase_amount": 0.0291,
+          "customer_age": -0.0073,
+          "returns": 0.01,
+          "age": -0.0073
+        },
+        "product_price": {
+          "customer_id": -0.002,
+          "product_price": 1.0,
+          "quantity": 0.0211,
+          "total_purchase_amount": -0.0172,
+          "customer_age": 0.0026,
+          "returns": 0.0349,
+          "age": 0.0026
+        },
+        "quantity": {
+          "customer_id": 0.0145,
+          "product_price": 0.0211,
+          "quantity": 1.0,
+          "total_purchase_amount": -0.0322,
+          "customer_age": -0.0188,
+          "returns": -0.0093,
+          "age": -0.0188
+        },
+        "total_purchase_amount": {
+          "customer_id": 0.0291,
+          "product_price": -0.0172,
+          "quantity": -0.0322,
+          "total_purchase_amount": 1.0,
+          "customer_age": 0.0521,
+          "returns": -0.0103,
+          "age": 0.0521
+        },
+        "customer_age": {
+          "customer_id": -0.0073,
+          "product_price": 0.0026,
+          "quantity": -0.0188,
+          "total_purchase_amount": 0.0521,
+          "customer_age": 1.0,
+          "returns": -0.0044,
+          "age": 1.0
+        },
+        "returns": {
+          "customer_id": 0.01,
+          "product_price": 0.0349,
+          "quantity": -0.0093,
+          "total_purchase_amount": -0.0103,
+          "customer_age": -0.0044,
+          "returns": 1.0,
+          "age": -0.0044
+        },
+        "age": {
+          "customer_id": -0.0073,
+          "product_price": 0.0026,
+          "quantity": -0.0188,
+          "total_purchase_amount": 0.0521,
+          "customer_age": 1.0,
+          "returns": -0.0044,
+          "age": 1.0
+        }
+      },
+      "top_categories": {
+        "product_category": [
+          {
+            "value": "Clothing",
+            "count": 587
+          },
+          {
+            "value": "Books",
+            "count": 583
+          },
+          {
+            "value": "Home",
+            "count": 421
+          },
+          {
+            "value": "Electronics",
+            "count": 409
+          }
+        ],
+        "payment_method": [
+          {
+            "value": "Credit Card",
+            "count": 796
+          },
+          {
+            "value": "PayPal",
+            "count": 613
+          },
+          {
+            "value": "Cash",
+            "count": 417
+          },
+          {
+            "value": "Crypto",
+            "count": 174
+          }
+        ],
+        "gender": [
+          {
+            "value": "Male",
+            "count": 1000
+          },
+          {
+            "value": "Female",
+            "count": 1000
+          }
+        ]
+      }
+    },
+    "modules": {
+      "kpis": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      },
+      "time_series": {
+        "enabled": false,
+        "required": [
+          "timestamp",
+          "revenue"
+        ],
+        "detected": {
+          "timestamp": null,
+          "revenue": null
+        }
+      },
+      "revenue_by_category": {
+        "enabled": false,
+        "required": [
+          "category",
+          "revenue"
+        ],
+        "detected": {
+          "category": null,
+          "revenue": null
+        }
+      },
+      "payment_analysis": {
+        "enabled": false,
+        "required": [
+          "payment_method",
+          "revenue"
+        ],
+        "detected": {
+          "payment_method": "payment_method",
+          "revenue": null
+        }
+      },
+      "returns": {
+        "enabled": false,
+        "required": [
+          "return_status"
+        ],
+        "detected": {
+          "return_status": null
+        }
+      },
+      "purchase_frequency": {
+        "enabled": true,
+        "required": [
+          "customer_id"
+        ],
+        "detected": {
+          "customer_id": "customer_id"
+        }
+      },
+      "segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "customer_segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue",
+          "timestamp"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null,
+          "timestamp": null
+        }
+      },
+      "clv": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "recommendations": {
+        "enabled": false,
+        "required": [
+          "product_id"
+        ],
+        "detected": {
+          "product_id": null
+        }
+      },
+      "anomalies": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      }
+    },
+    "tables": {
+      "raw": "raw_ds_6de4b0a27b774114907016bebcc1e628_v1",
+      "clean": "clean_ds_6de4b0a27b774114907016bebcc1e628_v1"
+    }
+  },
+  "ds_7e138f17a0e34413b96ea1910ee425d3::v1": {
+    "tenant_id": null,
+    "dataset_id": "ds_7e138f17a0e34413b96ea1910ee425d3",
+    "version_id": 1,
+    "created_at": "2026-03-29T10:49:47.286084+00:00",
+    "source_file_name": "E-commerce Customer Behavior - Sheet1.csv",
+    "source_file_path": ".data\\dynamic_dashboard_py\\uploads\\ds_7e138f17a0e34413b96ea1910ee425d3.csv",
+    "row_count": 350,
+    "columns": [
+      "customer_id",
+      "gender",
+      "age",
+      "city",
+      "membership_type",
+      "total_spend",
+      "items_purchased",
+      "average_rating",
+      "discount_applied",
+      "days_since_last_purchase",
+      "satisfaction_level"
+    ],
+    "schema": [
+      {
+        "name": "customer_id",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 1.0,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "gender",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.005714285714285714,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "age",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.045714285714285714,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "city",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.017142857142857144,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "membership_type",
+        "inferred_type": "categorical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.008571428571428572,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "total_spend",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.21714285714285714,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "items_purchased",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.04285714285714286,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "average_rating",
+        "inferred_type": "numerical",
+        "null_rate": 0.0,
+        "unique_ratio": 0.05714285714285714,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "discount_applied",
+        "inferred_type": "boolean",
+        "null_rate": 0.0,
+        "unique_ratio": 0.005714285714285714,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 1.0
+        }
+      },
+      {
+        "name": "days_since_last_purchase",
+        "inferred_type": "datetime",
+        "null_rate": 0.0,
+        "unique_ratio": 0.15428571428571428,
+        "parse_ratios": {
+          "numeric": 1.0,
+          "datetime": 1.0,
+          "boolean": 0.0
+        }
+      },
+      {
+        "name": "satisfaction_level",
+        "inferred_type": "categorical",
+        "null_rate": 0.005714285714285672,
+        "unique_ratio": 0.008620689655172414,
+        "parse_ratios": {
+          "numeric": 0.0,
+          "datetime": 0.0,
+          "boolean": 0.0
+        }
+      }
+    ],
+    "roles": {
+      "customer_id": {
+        "column": "customer_id",
+        "confidence": 1.0,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 1.0
+          }
+        ]
+      },
+      "order_id": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "product_id": {
+        "column": null,
+        "confidence": 0.513,
+        "candidates": [
+          {
+            "column": "items_purchased",
+            "confidence": 0.513
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "category": {
+        "column": null,
+        "confidence": 0.443,
+        "candidates": [
+          {
+            "column": "city",
+            "confidence": 0.443
+          },
+          {
+            "column": "membership_type",
+            "confidence": 0.443
+          },
+          {
+            "column": "gender",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "revenue": {
+        "column": null,
+        "confidence": 0.458,
+        "candidates": [
+          {
+            "column": "total_spend",
+            "confidence": 0.458
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "quantity": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "total_spend",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "timestamp": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "days_since_last_purchase",
+            "confidence": 0.35
+          },
+          {
+            "column": "customer_id",
+            "confidence": 0.15
+          },
+          {
+            "column": "gender",
+            "confidence": 0.15
+          }
+        ]
+      },
+      "payment_method": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "gender",
+            "confidence": 0.35
+          },
+          {
+            "column": "city",
+            "confidence": 0.35
+          },
+          {
+            "column": "membership_type",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "return_status": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "gender",
+            "confidence": 0.35
+          },
+          {
+            "column": "city",
+            "confidence": 0.35
+          },
+          {
+            "column": "membership_type",
+            "confidence": 0.35
+          }
+        ]
+      },
+      "refund_amount": {
+        "column": null,
+        "confidence": 0.35,
+        "candidates": [
+          {
+            "column": "customer_id",
+            "confidence": 0.35
+          },
+          {
+            "column": "age",
+            "confidence": 0.35
+          },
+          {
+            "column": "total_spend",
+            "confidence": 0.35
+          }
+        ]
+      }
+    },
+    "profile": {
+      "row_count": 350,
+      "column_count": 11,
+      "summary_stats": {
+        "customer_id": {
+          "mean": 275.5,
+          "median": 275.5,
+          "std": 101.03588471429346,
+          "min": 101.0,
+          "max": 450.0
+        },
+        "age": {
+          "mean": 33.597142857142856,
+          "median": 32.5,
+          "std": 4.863918803027964,
+          "min": 26.0,
+          "max": 43.0
+        },
+        "total_spend": {
+          "mean": 845.3817142857142,
+          "median": 775.2,
+          "std": 361.5410986634514,
+          "min": 410.8,
+          "max": 1520.1
+        },
+        "items_purchased": {
+          "mean": 12.6,
+          "median": 12.0,
+          "std": 4.150043029036825,
+          "min": 7.0,
+          "max": 21.0
+        },
+        "average_rating": {
+          "mean": 4.019142857142858,
+          "median": 4.1,
+          "std": 0.5797086530740934,
+          "min": 3.0,
+          "max": 4.9
+        }
+      },
+      "missing_values": {
+        "customer_id": 0.0,
+        "gender": 0.0,
+        "age": 0.0,
+        "city": 0.0,
+        "membership_type": 0.0,
+        "total_spend": 0.0,
+        "items_purchased": 0.0,
+        "average_rating": 0.0,
+        "discount_applied": 0.0,
+        "days_since_last_purchase": 0.0,
+        "satisfaction_level": 0.005714285714285714
+      },
+      "unique_counts": {
+        "customer_id": 350,
+        "gender": 2,
+        "age": 16,
+        "city": 6,
+        "membership_type": 3,
+        "total_spend": 76,
+        "items_purchased": 15,
+        "average_rating": 20,
+        "discount_applied": 2,
+        "days_since_last_purchase": 54,
+        "satisfaction_level": 3
+      },
+      "correlation_matrix": {
+        "customer_id": {
+          "customer_id": 1.0,
+          "age": 0.0112,
+          "total_spend": -0.0063,
+          "items_purchased": -0.0032,
+          "average_rating": -0.0005
+        },
+        "age": {
+          "customer_id": 0.0112,
+          "age": 1.0,
+          "total_spend": -0.6779,
+          "items_purchased": -0.6853,
+          "average_rating": -0.7223
+        },
+        "total_spend": {
+          "customer_id": -0.0063,
+          "age": -0.6779,
+          "total_spend": 1.0,
+          "items_purchased": 0.9724,
+          "average_rating": 0.9415
+        },
+        "items_purchased": {
+          "customer_id": -0.0032,
+          "age": -0.6853,
+          "total_spend": 0.9724,
+          "items_purchased": 1.0,
+          "average_rating": 0.922
+        },
+        "average_rating": {
+          "customer_id": -0.0005,
+          "age": -0.7223,
+          "total_spend": 0.9415,
+          "items_purchased": 0.922,
+          "average_rating": 1.0
+        }
+      },
+      "top_categories": {
+        "gender": [
+          {
+            "value": "Female",
+            "count": 175
+          },
+          {
+            "value": "Male",
+            "count": 175
+          }
+        ],
+        "city": [
+          {
+            "value": "New York",
+            "count": 59
+          },
+          {
+            "value": "Los Angeles",
+            "count": 59
+          },
+          {
+            "value": "Chicago",
+            "count": 58
+          },
+          {
+            "value": "San Francisco",
+            "count": 58
+          },
+          {
+            "value": "Miami",
+            "count": 58
+          },
+          {
+            "value": "Houston",
+            "count": 58
+          }
+        ],
+        "membership_type": [
+          {
+            "value": "Gold",
+            "count": 117
+          },
+          {
+            "value": "Silver",
+            "count": 117
+          },
+          {
+            "value": "Bronze",
+            "count": 116
+          }
+        ],
+        "satisfaction_level": [
+          {
+            "value": "Satisfied",
+            "count": 125
+          },
+          {
+            "value": "Unsatisfied",
+            "count": 116
+          },
+          {
+            "value": "Neutral",
+            "count": 107
+          },
+          {
+            "value": "None",
+            "count": 2
+          }
+        ]
+      }
+    },
+    "modules": {
+      "kpis": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      },
+      "time_series": {
+        "enabled": false,
+        "required": [
+          "timestamp",
+          "revenue"
+        ],
+        "detected": {
+          "timestamp": null,
+          "revenue": null
+        }
+      },
+      "revenue_by_category": {
+        "enabled": false,
+        "required": [
+          "category",
+          "revenue"
+        ],
+        "detected": {
+          "category": null,
+          "revenue": null
+        }
+      },
+      "payment_analysis": {
+        "enabled": false,
+        "required": [
+          "payment_method",
+          "revenue"
+        ],
+        "detected": {
+          "payment_method": null,
+          "revenue": null
+        }
+      },
+      "returns": {
+        "enabled": false,
+        "required": [
+          "return_status"
+        ],
+        "detected": {
+          "return_status": null
+        }
+      },
+      "purchase_frequency": {
+        "enabled": true,
+        "required": [
+          "customer_id"
+        ],
+        "detected": {
+          "customer_id": "customer_id"
+        }
+      },
+      "segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "customer_segmentation": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue",
+          "timestamp"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null,
+          "timestamp": null
+        }
+      },
+      "clv": {
+        "enabled": false,
+        "required": [
+          "customer_id",
+          "revenue"
+        ],
+        "detected": {
+          "customer_id": "customer_id",
+          "revenue": null
+        }
+      },
+      "recommendations": {
+        "enabled": false,
+        "required": [
+          "product_id"
+        ],
+        "detected": {
+          "product_id": null
+        }
+      },
+      "anomalies": {
+        "enabled": false,
+        "required": [
+          "revenue"
+        ],
+        "detected": {
+          "revenue": null
+        }
+      }
+    },
+    "tables": {
+      "raw": "raw_ds_7e138f17a0e34413b96ea1910ee425d3_v1",
+      "clean": "clean_ds_7e138f17a0e34413b96ea1910ee425d3_v1"
+    }
+  }
+}

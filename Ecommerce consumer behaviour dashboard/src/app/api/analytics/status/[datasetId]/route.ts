@@ -16,7 +16,16 @@ export async function GET(request: Request, { params }: Params) {
       { cache: "no-store" },
       request
     );
-    return NextResponse.json(data, { status: response.status });
+    const normalized =
+      data &&
+      typeof data === "object" &&
+      "data" in data &&
+      (data as { data?: JsonValue }).data &&
+      typeof (data as { data?: JsonValue }).data === "object" &&
+      "status" in ((data as { data?: JsonValue }).data as JsonObject)
+        ? (data as { data: JsonValue }).data
+        : data;
+    return NextResponse.json(normalized, { status: response.status });
   } catch {
     return NextResponse.json(
       { status: "pending", available_modules: [] },

@@ -44,3 +44,9 @@ Dataset/
 backend/.data/ 
 models/ 
 node_modules/ 
+Dataset/ 
+*.csv 
+*.duckdb 
+backend/.data/ 
+models/ 
+node_modules/ 

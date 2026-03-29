@@ -49,9 +49,12 @@ Live (dashboard) [https://ecommerce-consumer-behaviour-dashboard.vercel.app/](ht
 
 ## :cloud: Backend
 
-Application is connected to NodeJS backend, which is also open source and available on my Github. You can run it on platforms like Heroku.com or Render.com
+This repository includes a **FastAPI (Python) backend** under the `backend/` directory.
 
-[https://github.com/matt765/ecommerce-consumer-behaviour-dashboard-backend](https://github.com/matt765/ecommerce-consumer-behaviour-dashboard-backend)
+The frontend communicates with the backend through **Next.js API routes** under `src/app/api/*`, which:
+
+- proxy requests to the backend (`http://localhost:8000/api/*`)
+- optionally fall back to the local dynamic dashboard engine when the backend is unreachable
 
 ## :file_folder: Project Structure
 
@@ -117,6 +120,35 @@ All commands are run from the root of the project, from a terminal. Remember to 
 | `npm run format`       | Formats code with Prettier            |
 | `npm run format:check` | Checks if code is properly formatted  |
 
+### Run the frontend (Next.js)
+
+Start the dev server:
+
+```bash
+npm install
+npm run dev
+```
+
+Frontend runs at:
+
+- `http://localhost:3000`
+
+### Run the backend (FastAPI)
+
+From the `backend/` directory, create a virtual environment and start FastAPI:
+
+```bash
+python -m venv .venv
+.
+venv\\Scripts\\activate
+pip install -r requirements.txt
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Backend runs at:
+
+- `http://localhost:8000`
+
 ### Configure authentication
 
 To begin using Ecommerce Dashboard with authentication, you'll need to set up a Clerk account:
@@ -134,11 +166,28 @@ CLERK_SECRET_KEY=your_clerk_secret_key
 
 ### Backend connection
 
-ecommerce consumer Behaviour Dashboard is set up to retrieve data from a [GraphQL backend](https://github.com/matt765/ecommerce-consumer-behaviour-dashboard-backend) endpoint. This endpoint is defined by the `GRAPHQL_URL` environment variable in your `.env` file:
+You can optionally set an explicit backend URL for the Next.js API proxy:
 
 ```env
-GRAPHQL_URL=your_backend_url
+BACKEND_URL=http://localhost:8000
 ```
+
+If `BACKEND_URL` is not set, the proxy will try common local candidates (such as `127.0.0.1:8000`).
+
+### Key API endpoints
+
+Frontend (Next.js):
+
+- `GET /api/health`
+- `GET /api/datasets`
+- `POST /api/upload` (multipart form-data, field name: `file`)
+- `GET /api/dataset/{datasetId}/dashboard`
+
+Backend (FastAPI):
+
+- `GET /api/datasets`
+- `POST /api/upload`
+- `GET /api/dashboard?dataset_id={datasetId}`
 
 ### Production notes
 
