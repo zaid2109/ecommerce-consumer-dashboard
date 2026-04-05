@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EcoDash — E-commerce Analytics Dashboard
 
-## Getting Started
+## Overview
 
-First, run the development server:
+EcoDash is a high-performance Next.js 14 analytics dashboard built for large synthetic commerce datasets. It provides executive KPIs, multi-page analytics (overview, analytics, customers, products, payments, returns), and operational tooling (filters, CSV export, dynamic chart rendering) on top of a 100,000-order pre-aggregated data model.
+
+## Features
+
+- 6 dashboard experiences: Overview, Analytics, Customers, Products, Payments, Returns
+- 100k deterministic synthetic orders with rich pre-aggregations
+- Worker-assisted loading with progress UI
+- Dynamic chart loading (`ssr: false`) with skeleton fallbacks
+- Virtualized large data tables (React Virtuoso)
+- CSV export across table surfaces
+- Dark mode + responsive layout shell
+- Typed insights and recommendation systems
+
+## Tech stack
+
+| Library | Version | Purpose |
+|---|---:|---|
+| Next.js | 14.2.35 | App framework and routing |
+| React | 18.3.1 | UI runtime |
+| TypeScript | 5.x | Static typing |
+| Tailwind CSS | 4.x | Styling system |
+| Zustand | 4.x | Global filter state |
+| Recharts | 2.12.7 | Chart visualizations |
+| @tanstack/react-table | 8.x | Column model + table logic |
+| react-virtuoso | 4.x | Virtualized lists/tables |
+| date-fns | 3.x | Date/time formatting |
+| html2canvas | 1.4.x | Chart PNG downloads |
+
+## Getting started
 
 ```bash
+git clone <your-repo-url>
+cd ecommerce-dashboard
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+app/
+  dashboard/
+    page.tsx                 # Overview dashboard
+    analytics/page.tsx       # Analytics dashboard
+    customers/page.tsx       # Customer intelligence dashboard
+    products/page.tsx        # Product performance dashboard
+    payments/page.tsx        # Payment operations dashboard
+    returns/page.tsx         # Returns/refunds dashboard
+components/
+  cards/                     # KPI, insight, and action cards
+  charts/                    # Reusable chart primitives
+  layout/                    # Sidebar/Header/Shell/FilterBar
+  tables/                    # Virtual and paginated table components
+  ui/                        # Tooltips, skeletons, basic UI blocks
+hooks/
+  useChartData.ts            # Core dashboard data hooks
+  useDashboardData.ts        # Analytics/customers computations
+  useCommerceData.ts         # Products/payments/returns computations
+  useDebounce.ts             # Shared debounce hook
+lib/
+  data-generator.ts          # Deterministic 100k record seed data
+  data-store.ts              # Runtime data readiness + worker wiring
+  insights.ts                # Typed insight generation helpers
+  recommendations.ts         # Typed action recommendation engine
+  export.ts                  # CSV export utility
+  downloadChart.ts           # PNG download helper
+public/workers/
+  dataWorker.js              # Web Worker data bootstrap/progress
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Data layer
 
-## Learn More
+The data layer generates 100,000 deterministic synthetic orders and computes pre-aggregations for high-frequency dashboard reads (daily revenue, category trends, segment distribution, payment breakdowns, return rates, rating distributions, and country-level revenue). Hooks consume these structures with memoized filtering to avoid expensive recomputation on each render.
 
-To learn more about Next.js, take a look at the following resources:
+## Performance notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Web Worker loading**: startup data generation/progress is handled outside the main UI thread
+- **Virtualization**: large tables use `TableVirtuoso` to keep DOM size stable
+- **Memoization**: all major hook computations are wrapped in `useMemo` with explicit filter dependencies
+- **Dynamic chart imports**: chart bundles load on demand with skeleton fallbacks
+- **Controlled chart animation**: one-time animation pattern avoids repeated re-animation on filter changes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Screenshots
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[Add screenshot here]
