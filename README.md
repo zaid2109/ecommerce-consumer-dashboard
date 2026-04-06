@@ -1,89 +1,130 @@
-# EcoDash — E-commerce Analytics Dashboard
+# EcoDash - E-commerce Analytics Dashboard
 
-## Overview
+EcoDash is a production-hardened analytics dashboard built with Next.js 14 for large e-commerce datasets.  
+It includes multi-page insights, upload parsing, pre-aggregated metrics, and chart/table-heavy UI with accessibility and performance optimizations.
 
-EcoDash is a high-performance Next.js 14 analytics dashboard built for large synthetic commerce datasets. It provides executive KPIs, multi-page analytics (overview, analytics, customers, products, payments, returns), and operational tooling (filters, CSV export, dynamic chart rendering) on top of a 100,000-order pre-aggregated data model.
+## What you get
 
-## Features
-
-- 6 dashboard experiences: Overview, Analytics, Customers, Products, Payments, Returns
-- 100k deterministic synthetic orders with rich pre-aggregations
-- Worker-assisted loading with progress UI
-- Dynamic chart loading (`ssr: false`) with skeleton fallbacks
-- Virtualized large data tables (React Virtuoso)
-- CSV export across table surfaces
-- Dark mode + responsive layout shell
-- Typed insights and recommendation systems
+- Dashboard modules for overview, analytics, orders, customers, products, payments, returns, and settings
+- Synthetic data pipeline (100,000 orders) with static pre-aggregation generation
+- Upload parser API for CSV/XLS/XLSX ingestion (`exceljs`-based)
+- Virtualized tables and interactive chart components
+- Error boundaries and loading states for dashboard routes
+- Deployment-ready defaults (CI workflow, Vercel config, security headers)
 
 ## Tech stack
 
-| Library | Version | Purpose |
-|---|---:|---|
-| Next.js | 14.2.35 | App framework and routing |
-| React | 18.3.1 | UI runtime |
-| TypeScript | 5.x | Static typing |
-| Tailwind CSS | 4.x | Styling system |
-| Zustand | 4.x | Global filter state |
-| Recharts | 2.12.7 | Chart visualizations |
-| @tanstack/react-table | 8.x | Column model + table logic |
-| react-virtuoso | 4.x | Virtualized lists/tables |
-| date-fns | 3.x | Date/time formatting |
-| html2canvas | 1.4.x | Chart PNG downloads |
+- Next.js 14 (App Router)
+- React 18 + TypeScript
+- Tailwind CSS v4 + shadcn/ui primitives
+- Recharts + TanStack Table + React Virtuoso
+- Zustand for client state
+- date-fns + faker + exceljs
 
-## Getting started
+## Quick start
+
+### 1) Install
 
 ```bash
-git clone <your-repo-url>
-cd ecommerce-dashboard
 npm install
+```
+
+### 2) Configure environment
+
+```bash
+cp .env.example .env.local
+```
+
+Set required values in `.env.local`:
+
+- `ANTHROPIC_API_KEY` (required for dataset analysis API paths that use Anthropic)
+
+### 3) Generate static data
+
+```bash
+npm run generate
+```
+
+### 4) Run locally
+
+```bash
 npm run dev
 ```
 
-## Project structure
+Open: `http://localhost:3000/dashboard`
+
+## Scripts
+
+- `npm run dev` - start development server
+- `npm run build` - production build (runs `prebuild` -> `generate`)
+- `npm run start` - start production server
+- `npm run lint` - ESLint checks
+- `npm run type-check` - TypeScript validation (`tsc --noEmit`)
+- `npm run generate` - generate `public/data/aggregated.json`
+
+## Data pipeline
+
+The app uses a generated static aggregate file for fast dashboard loads:
+
+1. `lib/scripts/generate-static-data.ts` builds aggregate output
+2. Output is written to `public/data/aggregated.json`
+3. `lib/data-store.ts` reads and caches this data for the UI
+
+This design keeps heavy calculations out of render-time execution.
+
+## Project structure (high level)
 
 ```text
 app/
-  dashboard/
-    page.tsx                 # Overview dashboard
-    analytics/page.tsx       # Analytics dashboard
-    customers/page.tsx       # Customer intelligence dashboard
-    products/page.tsx        # Product performance dashboard
-    payments/page.tsx        # Payment operations dashboard
-    returns/page.tsx         # Returns/refunds dashboard
+  api/parse-file/route.ts         # Upload parsing endpoint
+  dashboard/                      # Dashboard pages + route boundaries
 components/
-  cards/                     # KPI, insight, and action cards
-  charts/                    # Reusable chart primitives
-  layout/                    # Sidebar/Header/Shell/FilterBar
-  tables/                    # Virtual and paginated table components
-  ui/                        # Tooltips, skeletons, basic UI blocks
-hooks/
-  useChartData.ts            # Core dashboard data hooks
-  useDashboardData.ts        # Analytics/customers computations
-  useCommerceData.ts         # Products/payments/returns computations
-  useDebounce.ts             # Shared debounce hook
+  charts/                         # Recharts visual components
+  tables/                         # Virtualized and standard tables
+  layout/                         # Sidebar, header, filters, shell
+hooks/                            # Data and chart hooks
 lib/
-  data-generator.ts          # Deterministic 100k record seed data
-  data-store.ts              # Runtime data readiness + worker wiring
-  insights.ts                # Typed insight generation helpers
-  recommendations.ts         # Typed action recommendation engine
-  export.ts                  # CSV export utility
-  downloadChart.ts           # PNG download helper
-public/workers/
-  dataWorker.js              # Web Worker data bootstrap/progress
+  data-generator.ts               # Synthetic dataset generation
+  data-store.ts                   # Aggregate loading/filter helpers
+  scripts/generate-static-data.ts # Build-time aggregate generator
+public/data/                      # Generated static data artifacts
 ```
 
-## Data layer
+## Deployment
 
-The data layer generates 100,000 deterministic synthetic orders and computes pre-aggregations for high-frequency dashboard reads (daily revenue, category trends, segment distribution, payment breakdowns, return rates, rating distributions, and country-level revenue). Hooks consume these structures with memoized filtering to avoid expensive recomputation on each render.
+### Vercel
 
-## Performance notes
+- `vercel.json` defines function durations and cache headers for `/data/*`.
+- Build command can remain default (`npm run build`), which includes data generation automatically.
 
-- **Web Worker loading**: startup data generation/progress is handled outside the main UI thread
-- **Virtualization**: large tables use `TableVirtuoso` to keep DOM size stable
-- **Memoization**: all major hook computations are wrapped in `useMemo` with explicit filter dependencies
-- **Dynamic chart imports**: chart bundles load on demand with skeleton fallbacks
-- **Controlled chart animation**: one-time animation pattern avoids repeated re-animation on filter changes
+### CI
 
-## Screenshots
+GitHub Actions workflow is included at:
 
-[Add screenshot here]
+- `.github/workflows/ci.yml`
+
+## Troubleshooting
+
+- If UI appears unstyled in dev:
+  1. Stop all dev servers
+  2. Delete `.next`
+  3. Run `npm run dev` again
+  4. Hard refresh browser (`Ctrl+F5`)
+
+- If build fails on missing generated data:
+  - Run `npm run generate` once, then retry build
+
+## Validation checklist
+
+Before pushing:
+
+```bash
+npm run type-check
+npm run lint
+npm run generate
+npm run build
+```
+
+## License
+
+Private/internal project. Add your preferred license if this will be public.
