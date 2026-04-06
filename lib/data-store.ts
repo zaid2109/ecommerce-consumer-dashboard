@@ -1,42 +1,43 @@
-import { aggregated, orders } from './data-generator'
-import type { Order } from './types'
+'use client'
+import { useState, useEffect } from 'react'
+import type { PreAggregated } from './types'
 
-export { aggregated, orders }
-export const dataReady: Promise<{ orders: Order[]; aggregated: typeof aggregated }> = new Promise((resolve) => {
-  if (typeof window === 'undefined') {
-    resolve({ orders, aggregated })
-    return
-  }
+// Module-level cache so we only fetch once
+let cachedAggregated: PreAggregated | null = null
+let fetchPromise: Promise<PreAggregated> | null = null
 
-  const worker = new Worker('/workers/dataWorker.js')
-  worker.addEventListener('message', (event: MessageEvent) => {
-    const payload = event.data as { type: string; orders: Order[]; aggregated: typeof aggregated }
-    if (payload?.type === 'done') {
-      resolve({ orders: payload.orders, aggregated: payload.aggregated })
-      worker.terminate()
-    }
-  })
-  worker.postMessage({ type: 'start' })
-})
+export function getAggregatedData(): Promise<PreAggregated> {
+  if (cachedAggregated) return Promise.resolve(cachedAggregated)
+  if (fetchPromise) return fetchPromise
 
-export type FilterState = {
-  dateRange: [Date, Date]
-  categories: string[]
-  segments: string[]
-  countries: string[]
-  paymentMethods: string[]
+  fetchPromise = fetch('/data/aggregated.json')
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to load dashboard data')
+      return res.json()
+    })
+    .then(data => {
+      cachedAggregated = data
+      return data
+    })
+
+  return fetchPromise
 }
 
-export function getFilteredOrders(filters: FilterState): Order[] {
-  const [startDate, endDate] = filters.dateRange
+export function useAggregatedData() {
+  const [data, setData] = useState<PreAggregated | null>(cachedAggregated)
+  const [loading, setLoading] = useState(!cachedAggregated)
+  const [error, setError] = useState<string | null>(null)
 
-  return orders.filter((order) => {
-    const inDateRange = order.orderDate >= startDate && order.orderDate <= endDate
-    const inCategory = filters.categories.length === 0 || filters.categories.includes(order.category)
-    const inSegment = filters.segments.length === 0 || filters.segments.includes(order.customerSegment)
-    const inCountry = filters.countries.length === 0 || filters.countries.includes(order.customerCountry)
-    const inPaymentMethod = filters.paymentMethods.length === 0 || filters.paymentMethods.includes(order.paymentMethod)
+  useEffect(() => {
+    if (cachedAggregated) {
+      setData(cachedAggregated)
+      setLoading(false)
+      return
+    }
+    getAggregatedData()
+      .then(d => { setData(d); setLoading(false) })
+      .catch(e => { setError(e.message); setLoading(false) })
+  }, [])
 
-    return inDateRange && inCategory && inSegment && inCountry && inPaymentMethod
-  })
+  return { data, loading, error }
 }

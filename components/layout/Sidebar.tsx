@@ -58,7 +58,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
           return (
             <Link key={href} href={href} title={collapsed ? label : undefined}>
-              <div className={`nav-link ui-focus ${isActive ? 'nav-link-active' : ''}`}>
+              <div className={`nav-link ui-focus ${isActive ? 'nav-link-active' : ''}`} aria-current={isActive ? 'page' : undefined}>
                 <Icon
                   size={17}
                   className={`shrink-0 ${isActive ? 'text-white' : 'text-sb-icon'}`}
@@ -71,6 +71,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </nav>
 
       <button
+        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         onClick={onToggle}
         className="ui-focus flex items-center justify-center h-10 mx-2 mb-1 rounded-lg
                    text-sb-icon hover:bg-sb-hover hover:text-white transition-colors"
@@ -98,5 +99,3 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     </aside>
   )
 }
-
-

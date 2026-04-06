@@ -46,7 +46,9 @@ export function VirtualTable<TData extends Record<string, any>>({
   return (
     <section className="sc sc-interactive p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
+        <label htmlFor="virtual-table-search" className="sr-only">Search</label>
         <input
+          id="virtual-table-search"
           value={localQuery}
           onChange={(e) => setLocalQuery(e.target.value)}
           placeholder="Search..."
@@ -56,7 +58,7 @@ export function VirtualTable<TData extends Record<string, any>>({
           <span className="text-xs text-tx-muted">{table.getRowModel().rows.length} rows (virtualized)</span>
           <Popover.Root>
             <Popover.Trigger asChild>
-              <button className="ui-focus inline-flex items-center gap-1 rounded-lg border border-[#2a3246] bg-[#111827] px-2 py-1 text-xs text-tx-secondary transition-all duration-200 hover:-translate-y-[1px] hover:border-[#334155]">
+              <button aria-label="Toggle visible columns" className="ui-focus inline-flex items-center gap-1 rounded-lg border border-[#2a3246] bg-[#111827] px-2 py-1 text-xs text-tx-secondary transition-all duration-200 hover:-translate-y-[1px] hover:border-[#334155]">
                 <Columns3 className="h-3.5 w-3.5" />
                 Columns
               </button>
@@ -96,6 +98,7 @@ export function VirtualTable<TData extends Record<string, any>>({
             <tr className="bg-[#141820]">
               {table.getHeaderGroups()[0].headers.map((header) => (
                 <th
+                  scope="col"
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
                   className="sticky top-0 cursor-pointer border-b border-[#2a3246] px-3 py-2 text-left text-xs uppercase tracking-wide text-tx-secondary"
@@ -119,4 +122,3 @@ export function VirtualTable<TData extends Record<string, any>>({
 }
 
 export default VirtualTable
-

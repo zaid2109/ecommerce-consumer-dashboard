@@ -10,12 +10,12 @@ type SegmentMethodHeatmapProps = {
 export const SegmentMethodHeatmap = memo(function SegmentMethodHeatmap({ methods, rows }: SegmentMethodHeatmapProps) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[700px]">
+      <table className="st w-full min-w-[700px]" role="table" aria-label="Segment by payment method heatmap table">
         <thead>
           <tr>
-            <th className="p-2 text-left text-xs text-gray-500">Segment</th>
+            <th scope="col" className="p-2 text-left text-xs text-gray-500">Segment</th>
             {methods.map((m) => (
-              <th key={m} className="p-2 text-center text-xs text-gray-500">{m}</th>
+              <th scope="col" key={m} className="p-2 text-center text-xs text-gray-500">{m}</th>
             ))}
           </tr>
         </thead>
@@ -45,5 +45,3 @@ export const SegmentMethodHeatmap = memo(function SegmentMethodHeatmap({ methods
 SegmentMethodHeatmap.displayName = 'SegmentMethodHeatmap'
 
 export default SegmentMethodHeatmap
-
-

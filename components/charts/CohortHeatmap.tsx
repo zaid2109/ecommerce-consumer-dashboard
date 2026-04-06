@@ -20,12 +20,12 @@ export const CohortHeatmap = memo(function CohortHeatmap({ data }: CohortHeatmap
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[640px] border-collapse">
+      <table className="st w-full min-w-[640px] border-collapse" role="table" aria-label="Cohort retention heatmap table">
         <thead>
           <tr>
-            <th className="p-2 text-left text-xs text-gray-500">Cohort</th>
+            <th scope="col" className="p-2 text-left text-xs text-gray-500">Cohort</th>
             {Array.from({ length: 12 }, (_, i) => (
-              <th key={i} className="p-2 text-center text-xs text-gray-500">
+              <th scope="col" key={i} className="p-2 text-center text-xs text-gray-500">
                 {i}
               </th>
             ))}
@@ -60,5 +60,3 @@ export const CohortHeatmap = memo(function CohortHeatmap({ data }: CohortHeatmap
 CohortHeatmap.displayName = 'CohortHeatmap'
 
 export default CohortHeatmap
-
-

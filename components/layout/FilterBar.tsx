@@ -39,6 +39,7 @@ type FilterDropdownProps = {
 function FilterDropdown({ label, options, value, onChange }: FilterDropdownProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const inputId = `filter-search-${label.toLowerCase().replace(/\s+/g, '-')}`
   const filtered = useMemo(
     () => options.filter((opt) => opt.toLowerCase().includes(query.toLowerCase())),
     [options, query]
@@ -53,7 +54,9 @@ function FilterDropdown({ label, options, value, onChange }: FilterDropdownProps
         </button>
       </Popover.Trigger>
       <Popover.Content align="start" className="w-64 p-3 sc z-50">
+        <label htmlFor={inputId} className="sr-only">Search</label>
         <input
+          id={inputId}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={`Search ${label.toLowerCase()}...`}
@@ -131,4 +134,3 @@ export function FilterBar() {
     </div>
   )
 }
-

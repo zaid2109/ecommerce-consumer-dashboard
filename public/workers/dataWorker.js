@@ -1,4 +1,7 @@
-/* eslint-disable no-restricted-globals */
+// LEGACY: This worker is no longer used in production.
+// Data is pre-generated at build time via npm run generate.
+// Kept for reference only.
+
 const categories = ['Electronics', 'Clothing', 'Home & Garden', 'Sports', 'Beauty', 'Books', 'Toys', 'Automotive', 'Food', 'Jewelry']
 const methods = ['Credit Card', 'Debit Card', 'UPI', 'Net Banking', 'Wallet', 'Buy Now Pay Later', 'Cash on Delivery']
 const segments = ['VIP', 'Regular', 'New', 'At-Risk', 'Churned']
@@ -92,3 +95,5 @@ self.onmessage = (event) => {
   self.postMessage({ type: 'progress', percent: 100 })
   self.postMessage({ type: 'done', orders, aggregated })
 }
+
+

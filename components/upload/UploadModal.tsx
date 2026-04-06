@@ -1,5 +1,6 @@
 'use client'
-import { useState, useCallback, useRef } from 'react'
+
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { X, Upload, AlertCircle, Loader2 } from 'lucide-react'
 import { useDatasetStore } from '@/lib/dataset-store'
 import { transformDataset } from '@/lib/dataset-transformer'
@@ -26,7 +27,39 @@ export function UploadModal({ onClose }: UploadModalProps) {
   const fileRef = useRef<HTMLInputElement>(null)
   const store = useDatasetStore()
 
+  useEffect(() => {
+    const el = document.getElementById('upload-modal-title')
+    el?.focus()
+  }, [])
+
+  const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+
   const processFile = useCallback(async (file: File) => {
+    const allowedTypes = ['.csv', '.xlsx', '.xls', '.tsv', '.json']
+    const filename = file.name.toLowerCase()
+    const isAllowed = allowedTypes.some(ext => filename.endsWith(ext))
+
+    if (!isAllowed) {
+      store.setUploadError(
+        `Unsupported file type "${file.name.split('.').pop()}". ` +
+        `Please upload a CSV, Excel (.xlsx/.xls), TSV, or JSON file.`
+      )
+      return
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      store.setUploadError(
+        `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). ` +
+        `Maximum allowed size is 50MB.`
+      )
+      return
+    }
+
+    if (file.size < 100) {
+      store.setUploadError('File appears to be empty. Please check your file and try again.')
+      return
+    }
+
     store.setIsUploading(true)
     store.setUploadError(null)
 
@@ -112,13 +145,13 @@ export function UploadModal({ onClose }: UploadModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }} onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="animate-in fade-in zoom-in-95 duration-200" style={{ background: '#141820', border: '1px solid #273149', borderRadius: 14, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 60px rgba(0,0,0,0.45)' }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="upload-modal-title" className="animate-in fade-in zoom-in-95 duration-200" style={{ background: '#141820', border: '1px solid #273149', borderRadius: 14, width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 60px rgba(0,0,0,0.45)' }}>
         <div className="flex items-center justify-between p-5 border-b border-[#1e2433]">
           <div>
-            <h2 className="text-[16px] font-semibold tracking-[-0.01em] text-[#f1f5f9]">Upload Dataset</h2>
+            <h2 id="upload-modal-title" tabIndex={-1} className="text-[16px] font-semibold tracking-[-0.01em] text-[#f1f5f9]">Upload Dataset</h2>
             <p className="text-[12px] text-[#6b7280] mt-0.5">CSV, Excel, TSV, or JSON — AI will auto-configure your dashboard</p>
           </div>
-          <button onClick={onClose} className="ui-focus w-8 h-8 rounded-lg flex items-center justify-center text-[#6b7280] hover:bg-[#1e2433] hover:text-[#f1f5f9] transition">
+          <button aria-label="Close upload modal" onClick={onClose} className="ui-focus w-8 h-8 rounded-lg flex items-center justify-center text-[#6b7280] hover:bg-[#1e2433] hover:text-[#f1f5f9] transition">
             <X size={16} />
           </button>
         </div>
@@ -131,7 +164,7 @@ export function UploadModal({ onClose }: UploadModalProps) {
                 <p className="text-[13px] font-medium text-red-300">Upload failed</p>
                 <p className="text-[12px] text-red-400/80 mt-0.5">{store.uploadError}</p>
               </div>
-              <button onClick={() => { store.setUploadError(null); store.setUploadStep('idle') }} className="ui-focus ml-auto text-red-400 hover:text-red-300">
+              <button aria-label="Dismiss upload error" onClick={() => { store.setUploadError(null); store.setUploadStep('idle') }} className="ui-focus ml-auto text-red-400 hover:text-red-300">
                 <X size={14} />
               </button>
             </div>

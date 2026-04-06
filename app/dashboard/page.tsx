@@ -112,11 +112,11 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="sc-title">Revenue per country</h3>
         </div>
-        <table className="st w-full">
+        <table className="st w-full" role="table" aria-label="Revenue by country">
           <thead>
             <tr>
-              <th>Country</th>
-              <th className="text-right">Sales</th>
+              <th scope="col">Country</th>
+              <th scope="col" className="text-right">Sales</th>
             </tr>
           </thead>
           <tbody>

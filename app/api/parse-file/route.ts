@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import type { Cell, Row } from 'exceljs'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -44,12 +45,42 @@ export async function POST(req: NextRequest) {
         })
         .filter((row) => Object.values(row).some((v) => v !== ''))
     } else if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
-      const XLSX = await import('xlsx')
-      const workbook = XLSX.read(buffer, { type: 'buffer', cellDates: true })
-      const sheetName = workbook.SheetNames[0]
-      const sheet = workbook.Sheets[sheetName]
-      rows = XLSX.utils.sheet_to_json(sheet, { defval: '' }) as Record<string, unknown>[]
-      columns = rows.length > 0 ? Object.keys(rows[0]) : []
+      const ExcelJS = await import('exceljs')
+      const workbook = new ExcelJS.Workbook()
+      const loadInput = buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]
+      await workbook.xlsx.load(loadInput)
+      const worksheet = workbook.worksheets[0]
+      if (!worksheet) {
+        return NextResponse.json({ error: 'Excel file has no worksheets.' }, { status: 400 })
+      }
+
+      const headerRow = worksheet.getRow(1)
+      columns = []
+      headerRow.eachCell((cell: Cell) => {
+        columns.push(String(cell.value ?? '').trim())
+      })
+
+      rows = []
+      worksheet.eachRow((row: Row, rowNumber: number) => {
+        if (rowNumber === 1) return // skip header
+        const rowObj: Record<string, unknown> = {}
+        row.eachCell({ includeEmpty: true }, (cell: Cell, colNumber: number) => {
+          const colName = columns[colNumber - 1]
+          if (!colName) return
+          // Normalize cell value
+          let val: unknown = cell.value
+          if (val && typeof val === 'object' && 'result' in val) {
+            val = (val as { result: unknown }).result // formula result
+          }
+          if (val instanceof Date) {
+            val = val.toISOString().slice(0, 10)
+          }
+          rowObj[colName] = val ?? ''
+        })
+        if (Object.values(rowObj).some((v) => v !== '' && v !== null && v !== undefined)) {
+          rows.push(rowObj)
+        }
+      })
     } else if (filename.endsWith('.json')) {
       const text = buffer.toString('utf-8')
       const parsed = JSON.parse(text) as unknown

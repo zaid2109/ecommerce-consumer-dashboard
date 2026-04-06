@@ -40,7 +40,9 @@ export function Header({ sidebarWidth }: HeaderProps) {
         <div className="flex items-center gap-2.5">
           <div className="relative">
             <Search size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-tx-muted" />
+            <label htmlFor="header-search-input" className="sr-only">Search</label>
             <input
+              id="header-search-input"
               readOnly
               placeholder="Search..."
               className="ui-focus h-9 w-[220px] rounded-full pl-8 pr-4 text-[13px] bg-[#f8fafc] dark:bg-[#1a2233] text-tx-primary dark:text-tx-inverse placeholder:text-tx-muted border border-[#e2e8f0] dark:border-[#2a3246] cursor-pointer"
@@ -61,17 +63,17 @@ export function Header({ sidebarWidth }: HeaderProps) {
           </button>
 
           {mounted && (
-            <button onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')} className="ui-focus w-9 h-9 rounded-full flex items-center justify-center text-tx-secondary dark:text-tx-muted hover:bg-[#f1f5f9] dark:hover:bg-[#1e2433] transition-colors">
+            <button aria-label="Toggle dark mode" onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')} className="ui-focus w-9 h-9 rounded-full flex items-center justify-center text-tx-secondary dark:text-tx-muted hover:bg-[#f1f5f9] dark:hover:bg-[#1e2433] transition-colors">
               {resolvedTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           )}
 
-          <button className="ui-focus relative w-9 h-9 rounded-full flex items-center justify-center text-tx-secondary dark:text-tx-muted hover:bg-[#f1f5f9] dark:hover:bg-[#1e2433] transition-colors">
+          <button aria-label="View notifications" className="ui-focus relative w-9 h-9 rounded-full flex items-center justify-center text-tx-secondary dark:text-tx-muted hover:bg-[#f1f5f9] dark:hover:bg-[#1e2433] transition-colors">
             <Bell size={16} />
             <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-accent" />
           </button>
 
-          <button className="ui-focus h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-[12px] font-bold text-white transition-transform duration-200 hover:scale-[1.03]">
+          <button aria-label="User menu" className="ui-focus h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-[12px] font-bold text-white transition-transform duration-200 hover:scale-[1.03]">
             JD
           </button>
         </div>

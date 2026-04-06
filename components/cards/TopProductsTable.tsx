@@ -21,14 +21,14 @@ export function TopProductsTable({ data, title = 'Bestselling products' }: TopPr
       <div className="mb-3.5">
         <h3 className="sc-title">{title}</h3>
       </div>
-      <table className="st w-full">
+      <table className="st w-full" role="table" aria-label="Bestselling products">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Category</th>
-            <th className="text-right">Orders</th>
-            <th className="text-right">Revenue</th>
-            <th className="text-right">Return %</th>
+            <th scope="col">#</th>
+            <th scope="col">Category</th>
+            <th scope="col" className="text-right">Orders</th>
+            <th scope="col" className="text-right">Revenue</th>
+            <th scope="col" className="text-right">Return %</th>
           </tr>
         </thead>
         <tbody>
@@ -57,4 +57,3 @@ export function TopProductsTable({ data, title = 'Bestselling products' }: TopPr
 }
 
 export default TopProductsTable
-
