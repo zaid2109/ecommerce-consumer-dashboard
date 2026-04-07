@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import KPICard from '@/components/cards/KPICard'
 import { useDataset } from '@/hooks/useDataset'
 import { formatCurrency } from '@/lib/utils'
+import WidgetErrorBoundary from '@/components/ui/WidgetErrorBoundary'
 
 const ChartSkeleton = ({ h = 240 }: { h?: number }) => (
   <div className="animate-pulse rounded-card bg-[#1e2433]" style={{ height: h }} />
@@ -103,22 +104,30 @@ export default function OrdersPage() {
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-5">
         <div className="xl:col-span-3" style={{ background: '#141820', border: '1px solid #1e2433', borderRadius: 10, padding: 20 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', marginBottom: 16 }}>Orders over time</p>
-          <OrdersAreaChart data={ordersOverTime} />
+          <WidgetErrorBoundary title="Orders over time">
+            <OrdersAreaChart data={ordersOverTime} />
+          </WidgetErrorBoundary>
         </div>
         <div className="xl:col-span-2" style={{ background: '#141820', border: '1px solid #1e2433', borderRadius: 10, padding: 20 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', marginBottom: 16 }}>Orders by category</p>
-          <OrdersByCategoryBar data={categoryData} />
+          <WidgetErrorBoundary title="Orders by category">
+            <OrdersByCategoryBar data={categoryData} />
+          </WidgetErrorBoundary>
         </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-5">
         <div className="xl:col-span-2" style={{ background: '#141820', border: '1px solid #1e2433', borderRadius: 10, padding: 20 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', marginBottom: 16 }}>Order status</p>
-          <OrderStatusDonut data={statusData} />
+          <WidgetErrorBoundary title="Order status">
+            <OrderStatusDonut data={statusData} />
+          </WidgetErrorBoundary>
         </div>
         <div className="xl:col-span-3" style={{ background: '#141820', border: '1px solid #1e2433', borderRadius: 10, padding: 20 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', marginBottom: 16 }}>Delivery time distribution</p>
-          <DeliveryHistogram aggregated={aggregated} />
+          <WidgetErrorBoundary title="Delivery time distribution">
+            <DeliveryHistogram aggregated={aggregated} />
+          </WidgetErrorBoundary>
         </div>
       </div>
 

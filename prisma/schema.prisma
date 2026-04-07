@@ -1,0 +1,224 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum WorkspacePlan {
+  STARTER
+  GROWTH
+  ENTERPRISE
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  ANALYST
+  VIEWER
+}
+
+enum DatasetStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum IngestionStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ConnectorType {
+  SHOPIFY
+  STRIPE
+  GA4
+  S3
+}
+
+enum ConnectorStatus {
+  CONNECTED
+  DISCONNECTED
+  ERROR
+}
+
+enum ConnectorSyncStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+  DEAD_LETTER
+}
+
+enum ConnectorSyncTrigger {
+  MANUAL
+  SCHEDULED
+  RETRY
+}
+
+model Workspace {
+  id         String      @id @default(cuid())
+  name       String
+  plan       WorkspacePlan @default(STARTER)
+  settings   Json?
+  createdAt  DateTime    @default(now())
+  users      User[]
+  datasets   Dataset[]
+  jobs       IngestionJob[]
+  auditLogs  AuditLog[]
+  invitations Invitation[]
+  connectors  Connector[]
+  connectorSyncJobs ConnectorSyncJob[]
+}
+
+model User {
+  id             String      @id @default(cuid())
+  workspaceId    String
+  email          String      @unique
+  passwordHash   String
+  role           UserRole
+  mfaEnabled     Boolean     @default(false)
+  mfaSecret      String?
+  mfaBackupCodes Json?
+  lastLogin      DateTime?
+  createdAt      DateTime    @default(now())
+  workspace      Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sessions       Session[]
+  auditLogs      AuditLog[]
+  datasets       Dataset[]   @relation("DatasetCreatedBy")
+}
+
+model Session {
+  id               String   @id @default(cuid())
+  userId           String
+  refreshTokenHash String
+  expiresAt        DateTime
+  ip               String?
+  userAgent        String?
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  userId       String?
+  action       String
+  resourceType String
+  resourceId   String?
+  metadata     Json?
+  createdAt    DateTime  @default(now())
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Invitation {
+  id          String    @id @default(cuid())
+  workspaceId String
+  email       String
+  role        UserRole
+  tokenHash   String
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model Dataset {
+  id             String         @id @default(cuid())
+  workspaceId    String
+  name           String
+  sourceType     String
+  status         DatasetStatus  @default(PENDING)
+  rowCount       Int            @default(0)
+  columnCount    Int            @default(0)
+  schema         Json?
+  s3RawKey       String?
+  s3ProcessedKey String?
+  createdById    String
+  createdAt      DateTime       @default(now())
+  version        Int            @default(1)
+  workspace      Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy      User           @relation("DatasetCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  jobs           IngestionJob[]
+}
+
+model IngestionJob {
+  id             String          @id @default(cuid())
+  datasetId      String
+  workspaceId    String
+  status         IngestionStatus @default(QUEUED)
+  idempotencyKey String
+  startedAt      DateTime?
+  completedAt    DateTime?
+  errorMessage   String?
+  retryCount     Int             @default(0)
+  metadata       Json?
+  dataset        Dataset         @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, idempotencyKey])
+}
+
+model Connector {
+  id            String          @id @default(cuid())
+  workspaceId   String
+  type          ConnectorType
+  status        ConnectorStatus @default(DISCONNECTED)
+  displayName   String
+  config        Json?
+  lastSyncAt    DateTime?
+  rowsSynced    Int             @default(0)
+  lastError     String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  workspace     Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  syncJobs      ConnectorSyncJob[]
+
+  @@unique([workspaceId, type])
+}
+
+model ConnectorSyncJob {
+  id               String               @id @default(cuid())
+  connectorId      String
+  workspaceId      String
+  trigger          ConnectorSyncTrigger
+  status           ConnectorSyncStatus  @default(QUEUED)
+  attempts         Int                  @default(0)
+  maxAttempts      Int                  @default(3)
+  errorMessage     String?
+  deadLetterReason String?
+  metadata         Json?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  connector        Connector            @relation(fields: [connectorId], references: [id], onDelete: Cascade)
+  workspace        Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt])
+  @@index([connectorId, createdAt])
+}
+
+model MagicLinkToken {
+  id         String    @id @default(cuid())
+  email      String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model OAuthState {
+  id           String    @id @default(cuid())
+  provider     String
+  state        String    @unique
+  codeVerifier String
+  redirectUri  String
+  expiresAt    DateTime
+  usedAt       DateTime?
+  createdAt    DateTime  @default(now())
+}

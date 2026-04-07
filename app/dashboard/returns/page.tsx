@@ -6,6 +6,7 @@ import KPICard from '@/components/cards/KPICard'
 import InsightBanner from '@/components/cards/InsightBanner'
 import RecommendedActions from '@/components/cards/RecommendedActions'
 import ChartInfoTooltip from '@/components/ui/ChartInfoTooltip'
+import WidgetErrorBoundary from '@/components/ui/WidgetErrorBoundary'
 import { useReturnsData } from '@/hooks/useCommerceData'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 import SimpleCsvTable from '@/components/tables/SimpleCsvTable'
@@ -66,14 +67,18 @@ export default function ReturnsPage() {
             <h3 className="sc-title">Return rate by category</h3>
             <ChartInfoTooltip text="Identifies which categories drive the most refund costs and quality risk." />
           </div>
-          <ReturnRateCategoryBar data={data.categoryRateData.map((r) => ({ category: r.category, rate: r.rate }))} />
+          <WidgetErrorBoundary title="Return rate by category">
+            <ReturnRateCategoryBar data={data.categoryRateData.map((r) => ({ category: r.category, rate: r.rate }))} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">Return reasons</h3>
             <ChartInfoTooltip text="Breaks down top return reasons to guide merchandising and quality interventions." />
           </div>
-          <ReturnReasonDonut data={data.reasonDonut} />
+          <WidgetErrorBoundary title="Return reasons">
+            <ReturnReasonDonut data={data.reasonDonut} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -83,14 +88,18 @@ export default function ReturnsPage() {
             <h3 className="sc-title">Return timeline (days after purchase)</h3>
             <ChartInfoTooltip text="Shows when returns occur after purchase to optimize post-delivery follow-up timing." />
           </div>
-          <ReturnTimelineLine data={data.returnTimeline} />
+          <WidgetErrorBoundary title="Return timeline">
+            <ReturnTimelineLine data={data.returnTimeline} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">Returns by segment</h3>
             <ChartInfoTooltip text="Compares return behavior by customer segment to target support and policy efforts." />
           </div>
-          <ReturnBySegmentBar data={data.returnBySegment} />
+          <WidgetErrorBoundary title="Returns by segment">
+            <ReturnBySegmentBar data={data.returnBySegment} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -99,7 +108,9 @@ export default function ReturnsPage() {
           <h3 className="sc-title">Return rate over time</h3>
           <ChartInfoTooltip text="Tracks long-term return trend and campaign impact markers to evaluate policy changes." />
         </div>
-        <ReturnRateOverTime data={data.returnRateOverTime} />
+        <WidgetErrorBoundary title="Return rate over time">
+          <ReturnRateOverTime data={data.returnRateOverTime} />
+        </WidgetErrorBoundary>
       </section>
 
       <section className="sc">
@@ -107,15 +118,19 @@ export default function ReturnsPage() {
           <h3 className="sc-title">Refund heatmap</h3>
           <ChartInfoTooltip text="Displays category-month refund intensity to reveal persistent problem clusters." />
         </div>
-        <RefundHeatmap data={data.refundHeatmap} />
+        <WidgetErrorBoundary title="Refund heatmap">
+          <RefundHeatmap data={data.refundHeatmap} />
+        </WidgetErrorBoundary>
       </section>
 
-      <SimpleCsvTable
-        title="Returned orders"
-        filename="returns-orders.csv"
-        columns={['Order ID', 'Category', 'Reason', 'Days to Return', 'Refund Amount', 'Segment', 'Resolution']}
-        rows={rows}
-      />
+      <WidgetErrorBoundary title="Returned orders table">
+        <SimpleCsvTable
+          title="Returned orders"
+          filename="returns-orders.csv"
+          columns={['Order ID', 'Category', 'Reason', 'Days to Return', 'Refund Amount', 'Segment', 'Resolution']}
+          rows={rows}
+        />
+      </WidgetErrorBoundary>
 
       <RecommendedActions actions={actions} />
     </div>

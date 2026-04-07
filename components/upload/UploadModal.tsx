@@ -3,12 +3,25 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { X, Upload, AlertCircle, Loader2 } from 'lucide-react'
 import { useDatasetStore } from '@/lib/dataset-store'
-import { transformDataset } from '@/lib/dataset-transformer'
+import type { ColumnMapping } from '@/lib/dataset-store'
 import { ColumnMapper } from './ColumnMapper'
 import { UploadProgress } from './UploadProgress'
+import { withCsrfHeader } from '@/lib/csrf-client'
+import { fetchWithAuth } from '@/lib/auth-client'
 
 interface UploadModalProps {
   onClose: () => void
+}
+
+interface AnalyzeResult {
+  datasetType: string
+  columnMapping: ColumnMapping
+  insights: string[]
+  suggestedKPIs?: { label: string; value: string; delta: string; positive: boolean }[]
+  dateFormat?: string | null
+  currencySymbol?: string
+  missingColumns: string[]
+  confidence: 'high' | 'medium' | 'low'
 }
 
 function formatUploadError(message: string): string {
@@ -23,7 +36,7 @@ function formatUploadError(message: string): string {
 
 export function UploadModal({ onClose }: UploadModalProps) {
   const [dragging, setDragging] = useState(false)
-  const [aiResult, setAiResult] = useState<any>(null)
+  const [aiResult, setAiResult] = useState<(AnalyzeResult & { rowCount: number; fileName: string; columns: string[] }) | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const store = useDatasetStore()
 
@@ -68,19 +81,28 @@ export function UploadModal({ onClose }: UploadModalProps) {
       const formData = new FormData()
       formData.append('file', file)
 
-      const parseRes = await fetch('/api/parse-file', { method: 'POST', body: formData })
+      const parseRes = await fetchWithAuth('/api/parse-file', {
+        method: 'POST',
+        body: formData,
+        headers: withCsrfHeader(),
+      })
       if (!parseRes.ok) {
         const err = await parseRes.json()
         throw new Error(err.error ?? 'Failed to parse file')
       }
 
-      const { rows, columns, rowCount, sample, fileName } = await parseRes.json()
-      store.setRawRows(rows)
+      const { columns, rowCount, sample, fileName, parseFingerprint, rawArtifactKey, processedArtifactKey, processedMetrics } = await parseRes.json()
+      const idempotencyKey = String(parseFingerprint ?? '')
+      if (!idempotencyKey) {
+        throw new Error('Parser did not return a fingerprint')
+      }
 
       store.setUploadStep('analyzing')
-      const analyzeRes = await fetch('/api/analyze-dataset', {
+      const analyzeRes = await fetchWithAuth('/api/analyze-dataset', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: withCsrfHeader({
+          'Content-Type': 'application/json',
+        }),
         body: JSON.stringify({ columns, sample, fileName, rowCount }),
       })
 
@@ -89,7 +111,41 @@ export function UploadModal({ onClose }: UploadModalProps) {
         throw new Error(err.error ?? 'AI analysis failed')
       }
 
-      const analysis = await analyzeRes.json()
+      const analysisRaw = (await analyzeRes.json()) as AnalyzeResult
+      const analysis: AnalyzeResult = {
+        ...analysisRaw,
+        insights: analysisRaw.insights ?? [],
+        missingColumns: analysisRaw.missingColumns ?? [],
+      }
+      const datasetsRes = await fetchWithAuth('/api/datasets', {
+        method: 'POST',
+        headers: withCsrfHeader({
+          'Content-Type': 'application/json',
+        }),
+        body: JSON.stringify({
+          name: fileName.replace(/\.[^.]+$/, ''),
+          sourceType: 'UPLOAD',
+          rowCount,
+          columnCount: columns.length,
+          schema: {
+            columns,
+            columnMapping: analysis.columnMapping,
+          },
+          idempotencyKey,
+          rawArtifactKey,
+          processedArtifactKey,
+          processedMetrics: {
+            ...(processedMetrics ?? {}),
+            dateFormat: analysis.dateFormat ?? null,
+            currencySymbol: analysis.currencySymbol ?? '$',
+          },
+        }),
+      })
+      if (!datasetsRes.ok) {
+        const err = await datasetsRes.json()
+        throw new Error(err.error ?? 'Failed to create dataset')
+      }
+
       setAiResult({ ...analysis, rowCount, fileName, columns })
       store.setColumnMapping(analysis.columnMapping)
       store.setMeta({
@@ -110,23 +166,12 @@ export function UploadModal({ onClose }: UploadModalProps) {
     }
   }, [store])
 
-  const handleConfirmMapping = useCallback(async (mapping: any) => {
+  const handleConfirmMapping = useCallback(async (mapping: ColumnMapping) => {
     try {
       store.setUploadStep('transforming')
       store.setColumnMapping(mapping)
 
-      const rows = store.rawRows
-      if (!rows) throw new Error('No rows in store')
-
       await new Promise((resolve) => setTimeout(resolve, 50))
-      const transformed = transformDataset({
-        rows,
-        mapping,
-        dateFormat: aiResult?.dateFormat,
-        currencySymbol: aiResult?.currencySymbol ?? '$',
-      })
-
-      store.setActiveDataset(transformed.aggregated, transformed.orders)
       store.setIsUploading(false)
       onClose()
     } catch (err) {
@@ -134,7 +179,7 @@ export function UploadModal({ onClose }: UploadModalProps) {
       store.setUploadError(formatUploadError(message))
       store.setIsUploading(false)
     }
-  }, [store, aiResult, onClose])
+  }, [store, onClose])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()

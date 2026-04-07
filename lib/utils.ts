@@ -60,8 +60,11 @@ export function interpolateColor(value: number, min: number, max: number, from: 
 export function getFlagEmoji(countryName: string): string {
   const map: Record<string, string> = {
     'United States': '🇺🇸',
+    USA: '🇺🇸',
+    US: '🇺🇸',
     France: '🇫🇷',
     'United Kingdom': '🇬🇧',
+    UK: '🇬🇧',
     Germany: '🇩🇪',
     India: '🇮🇳',
     Australia: '🇦🇺',
@@ -77,6 +80,15 @@ export function getFlagEmoji(countryName: string): string {
     Mexico: '🇲🇽',
     Singapore: '🇸🇬',
     UAE: '🇦🇪',
+    'United Arab Emirates': '🇦🇪',
   }
-  return map[countryName] ?? '🌐'
+  const direct = map[countryName]
+  if (direct) return direct
+
+  const normalized = countryName.trim().toLowerCase()
+  if (normalized.includes('united states')) return '🇺🇸'
+  if (normalized.includes('united kingdom')) return '🇬🇧'
+  if (normalized.includes('united arab emirates')) return '🇦🇪'
+
+  return '🌐'
 }

@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import type { Order, PreAggregated } from './types'
 
 export interface ColumnMapping {
+  orderId: string | null
   date: string | null
   revenue: string | null
   category: string | null

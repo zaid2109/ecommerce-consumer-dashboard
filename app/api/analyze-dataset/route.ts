@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { normalizeColumnMapping } from '@/lib/column-mapper'
 import type { ColumnMapping } from '@/lib/dataset-store'
+import { canAccess, readAuthContext } from '@/lib/server/auth'
+import { enforceCsrf } from '@/lib/server/security'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -28,6 +30,7 @@ type AnalyzeResponse = {
 }
 
 const MAPPING_KEYS: (keyof ColumnMapping)[] = [
+  'orderId',
   'date',
   'revenue',
   'category',
@@ -46,6 +49,7 @@ const MAPPING_KEYS: (keyof ColumnMapping)[] = [
 ]
 
 const CANDIDATE_PATTERNS: Record<keyof ColumnMapping, RegExp[]> = {
+  orderId: [/\border\s*id\b/i, /\bid\b/i, /transaction.*id/i, /invoice.*id/i],
   date: [/date/i, /order.*date/i, /transaction.*date/i, /created.*at/i, /timestamp/i],
   revenue: [/revenue/i, /sales?/i, /amount/i, /total/i, /gmv/i, /net.*sales/i],
   category: [/category/i, /product.*type/i, /department/i, /vertical/i],
@@ -139,6 +143,14 @@ function buildFallbackAnalysis(columns: string[], sample: Record<string, unknown
 }
 
 export async function POST(req: NextRequest) {
+  const csrfError = enforceCsrf(req)
+  if (csrfError) return csrfError
+
+  const auth = readAuthContext(req)
+  if (!auth || !canAccess(auth.role, 'dataset:write')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const body = (await req.json()) as AnalyzeBody
   const { columns, sample, fileName = 'dataset', rowCount = 0 } = body
 
@@ -154,7 +166,7 @@ export async function POST(req: NextRequest) {
   try {
     const sampleStr = JSON.stringify(sample.slice(0, 20), null, 2)
 
-    const prompt = `You are a data analyst. A user uploaded a file named "${fileName}" with ${rowCount} rows and these columns: ${columns.join(', ')}\n\nHere is a 20-row sample of the data:\n${sampleStr}\n\nReturn ONLY valid JSON with keys datasetType, columnMapping, insights, suggestedKPIs, dateFormat, currencySymbol, missingColumns, confidence. columnMapping should include keys date,revenue,category,customerName,customerSegment,country,quantity,unitPrice,paymentMethod,paymentStatus,isReturned,returnReason,rating,discount,productName. Use null where unknown.`
+    const prompt = `You are a data analyst. A user uploaded a file named "${fileName}" with ${rowCount} rows and these columns: ${columns.join(', ')}\n\nHere is a 20-row sample of the data:\n${sampleStr}\n\nReturn ONLY valid JSON with keys datasetType, columnMapping, insights, suggestedKPIs, dateFormat, currencySymbol, missingColumns, confidence. columnMapping should include keys orderId,date,revenue,category,customerName,customerSegment,country,quantity,unitPrice,paymentMethod,paymentStatus,isReturned,returnReason,rating,discount,productName. Use null where unknown.`
 
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',

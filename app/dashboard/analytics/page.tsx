@@ -6,6 +6,7 @@ import KPICard from '@/components/cards/KPICard'
 import InsightBanner from '@/components/cards/InsightBanner'
 import RecommendedActions from '@/components/cards/RecommendedActions'
 import ChartInfoTooltip from '@/components/ui/ChartInfoTooltip'
+import WidgetErrorBoundary from '@/components/ui/WidgetErrorBoundary'
 import { useAnalyticsPageData } from '@/hooks/useDashboardData'
 import { formatNumber } from '@/lib/utils'
 import { useDataset } from '@/hooks/useDataset'
@@ -54,14 +55,18 @@ export default function AnalyticsPage() {
             <h3 className="sc-title">Frequency distribution</h3>
             <ChartInfoTooltip text="Shows how often customers purchase, highlighting repeat behavior concentration." />
           </div>
-          <FrequencyHistogram data={data.frequencyData} />
+          <WidgetErrorBoundary title="Frequency distribution">
+            <FrequencyHistogram data={data.frequencyData} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc xl:col-span-3">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">Cohort retention</h3>
             <ChartInfoTooltip text="Tracks repeat purchasing by cohort month to reveal retention decay and loyalty quality." />
           </div>
-          <CohortHeatmap data={data.cohortData} />
+          <WidgetErrorBoundary title="Cohort retention">
+            <CohortHeatmap data={data.cohortData} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -71,14 +76,18 @@ export default function AnalyticsPage() {
             <h3 className="sc-title">Day of week pattern</h3>
             <ChartInfoTooltip text="Compares weekday demand cycles so marketing and inventory can align with peak order days." />
           </div>
-          <DayOfWeekChart data={data.dayOfWeekData} />
+          <WidgetErrorBoundary title="Day of week pattern">
+            <DayOfWeekChart data={data.dayOfWeekData} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">Time of day heatmap</h3>
             <ChartInfoTooltip text="Surfaces hour-level traffic hotspots to optimize staffing, campaigns, and fulfillment cutoffs." />
           </div>
-          <TimeOfDayHeatmap data={data.timeOfDayData} />
+          <WidgetErrorBoundary title="Time of day heatmap">
+            <TimeOfDayHeatmap data={data.timeOfDayData} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -87,10 +96,14 @@ export default function AnalyticsPage() {
           <h3 className="sc-title">Moving average trend</h3>
           <ChartInfoTooltip text="Smooths revenue volatility to expose true short and medium-term demand direction." />
         </div>
-        <MovingAverageChart data={data.movingAverageData} />
+        <WidgetErrorBoundary title="Moving average trend">
+          <MovingAverageChart data={data.movingAverageData} />
+        </WidgetErrorBoundary>
       </section>
 
-      <AnalyticsCustomerTable rows={data.tableRows} />
+      <WidgetErrorBoundary title="Analytics customer table">
+        <AnalyticsCustomerTable rows={data.tableRows} />
+      </WidgetErrorBoundary>
       <RecommendedActions actions={actions} />
     </div>
   )

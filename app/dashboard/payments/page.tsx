@@ -6,6 +6,7 @@ import KPICard from '@/components/cards/KPICard'
 import InsightBanner from '@/components/cards/InsightBanner'
 import RecommendedActions from '@/components/cards/RecommendedActions'
 import ChartInfoTooltip from '@/components/ui/ChartInfoTooltip'
+import WidgetErrorBoundary from '@/components/ui/WidgetErrorBoundary'
 import { usePaymentsData } from '@/hooks/useCommerceData'
 import { formatNumber } from '@/lib/utils'
 import PaymentOrdersTable from '@/components/tables/PaymentOrdersTable'
@@ -55,14 +56,18 @@ export default function PaymentsPage() {
             <h3 className="sc-title">Payment share</h3>
             <ChartInfoTooltip text="Shows distribution of payment method usage to identify dependence and diversification needs." />
           </div>
-          <PaymentShareDonut data={data.donutData} />
+          <WidgetErrorBoundary title="Payment share">
+            <PaymentShareDonut data={data.donutData} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">Payment trend</h3>
             <ChartInfoTooltip text="Compares monthly payment method trajectory to detect channel preference shifts." />
           </div>
-          <PaymentTrendLine data={data.trendData} methods={data.segmentMethodHeatmap.methods} />
+          <WidgetErrorBoundary title="Payment trend">
+            <PaymentTrendLine data={data.trendData} methods={data.segmentMethodHeatmap.methods} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -72,14 +77,18 @@ export default function PaymentsPage() {
             <h3 className="sc-title">Failure rate by method</h3>
             <ChartInfoTooltip text="Highlights methods with excessive failures against portfolio benchmark to prioritize fixes." />
           </div>
-          <FailureRateBar data={data.failureData} benchmark={data.avgFailureBenchmark} />
+          <WidgetErrorBoundary title="Failure rate by method">
+            <FailureRateBar data={data.failureData} benchmark={data.avgFailureBenchmark} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">Avg transaction by method</h3>
             <ChartInfoTooltip text="Compares transaction value quality by payment method to optimize checkout default ordering." />
           </div>
-          <AvgTransactionBar data={data.avgTxData} />
+          <WidgetErrorBoundary title="Avg transaction by method">
+            <AvgTransactionBar data={data.avgTxData} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -88,10 +97,14 @@ export default function PaymentsPage() {
           <h3 className="sc-title">Segment × Method heatmap</h3>
           <ChartInfoTooltip text="Reveals segment-specific method preferences for targeted payment UX optimization." />
         </div>
-        <SegmentMethodHeatmap methods={data.segmentMethodHeatmap.methods} rows={data.segmentMethodHeatmap.rows} />
+        <WidgetErrorBoundary title="Segment by method heatmap">
+          <SegmentMethodHeatmap methods={data.segmentMethodHeatmap.methods} rows={data.segmentMethodHeatmap.rows} />
+        </WidgetErrorBoundary>
       </section>
 
-      <PaymentOrdersTable rows={data.paymentTableRows} />
+      <WidgetErrorBoundary title="Payment orders table">
+        <PaymentOrdersTable rows={data.paymentTableRows} />
+      </WidgetErrorBoundary>
 
       <RecommendedActions actions={actions} />
     </div>

@@ -23,15 +23,15 @@ export const CategoryDonutChart = memo(function CategoryDonutChart({
   }, [])
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={340}>
       <PieChart>
         <Tooltip content={(props) => <SpireTooltip {...props} formatter={(value: number) => formatCurrency(value)} />} />
         <Pie
           data={data}
           dataKey="value"
           nameKey="name"
-          innerRadius={60}
-          outerRadius={100}
+          innerRadius={70}
+          outerRadius={112}
           paddingAngle={2}
           isAnimationActive={!hasAnimated.current}
         >

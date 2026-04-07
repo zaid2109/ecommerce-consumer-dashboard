@@ -9,6 +9,7 @@ import SparklineChart from '@/components/charts/SparklineChart'
 import RevenueLineChart from '@/components/charts/RevenueLineChart'
 import WeeklyBarChart from '@/components/charts/WeeklyBarChart'
 import CategoryDonutChart from '@/components/charts/CategoryDonutChart'
+import WorldRevenueMap from '@/components/charts/WorldRevenueMap'
 import {
   useActivityEvents,
   useCategoryData,
@@ -18,6 +19,7 @@ import {
   useRatingDistributionData,
   useWeeklyPerformanceData,
 } from '@/hooks/useChartData'
+import WidgetErrorBoundary from '@/components/ui/WidgetErrorBoundary'
 import { formatCurrency, formatNumber, getFlagEmoji } from '@/lib/utils'
 
 const GRANULARITY_OPTIONS = ['day', 'week', 'month', 'year'] as const
@@ -28,7 +30,8 @@ export default function DashboardPage() {
   const categoryData = useCategoryData()
   const activityEvents = useActivityEvents()
   const weeklyData = useWeeklyPerformanceData()
-  const countryData = useCountryRevenueData().slice(0, 6)
+  const fullCountryData = useCountryRevenueData()
+  const countryData = fullCountryData.slice(0, 6)
   const ratingData = useRatingDistributionData()
 
   const chartGranularity = granularity === 'day' ? 'daily' : granularity === 'week' ? 'weekly' : 'monthly'
@@ -62,6 +65,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-5">
+        <WidgetErrorBoundary title="Revenue over time">
         <div className="xl:col-span-3 sc">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -81,53 +85,78 @@ export default function DashboardPage() {
           </div>
           <RevenueLineChart data={revenueSeries} granularity={chartGranularity} />
         </div>
+        </WidgetErrorBoundary>
+        <WidgetErrorBoundary title="Weekly Performance">
         <div className="xl:col-span-2 sc">
           <h3 className="sc-title mb-4">Weekly Performance</h3>
           <WeeklyBarChart data={weeklyData} />
         </div>
+        </WidgetErrorBoundary>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-5">
-        <div className="xl:col-span-2 sc">
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-5 items-stretch">
+        <WidgetErrorBoundary title="Bestselling products">
+        <div className="xl:col-span-2 sc h-full xl:min-h-[620px]">
           <TopProductsTable data={categoryData} title="Bestselling products" />
         </div>
-        <div className="xl:col-span-2 sc">
+        </WidgetErrorBoundary>
+        <WidgetErrorBoundary title="Customer satisfaction">
+        <div className="xl:col-span-2 sc h-full xl:min-h-[620px] flex flex-col">
           <h3 className="sc-title mb-4">Customer satisfaction</h3>
-          <CategoryDonutChart data={donutData} centerLabel={avgRating} />
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="flex-1 flex items-center justify-center">
+            <CategoryDonutChart data={donutData} centerLabel={avgRating} />
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
             {donutData.map((item) => (
-              <span key={item.name} className="inline-flex items-center gap-1.5 rounded-full bg-[#f1f5f9] dark:bg-[#1e2433] px-2 py-1 text-[11px] text-tx-secondary dark:text-tx-muted">
+              <span key={item.name} className="inline-flex items-center gap-1.5 rounded-full bg-[#1b2438] px-2.5 py-1 text-[11px] text-[#94a3b8]">
                 <span className="h-2 w-2 rounded-full" style={{ background: item.color }} />
                 {item.name}
               </span>
             ))}
           </div>
         </div>
-        <div className="xl:col-span-1 sc">
+        </WidgetErrorBoundary>
+        <WidgetErrorBoundary title="Activity Feed">
+        <div className="xl:col-span-1 sc h-full xl:min-h-[620px]">
           <ActivityFeed events={activityEvents} />
         </div>
+        </WidgetErrorBoundary>
       </div>
 
       <div className="sc">
         <div className="flex items-center justify-between mb-4">
           <h3 className="sc-title">Revenue per country</h3>
         </div>
-        <table className="st w-full" role="table" aria-label="Revenue by country">
-          <thead>
-            <tr>
-              <th scope="col">Country</th>
-              <th scope="col" className="text-right">Sales</th>
-            </tr>
-          </thead>
-          <tbody>
-            {countryData.map((row) => (
-              <tr key={row.country}>
-                <td><div className="flex items-center gap-2"><span>{getFlagEmoji(row.country)}</span><span>{row.country}</span></div></td>
-                <td className="text-right font-semibold">{formatCurrency(row.revenue)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-5">
+          <div className="xl:col-span-3">
+            <WorldRevenueMap data={fullCountryData} />
+          </div>
+          <div className="xl:col-span-2">
+            <div className="rounded-xl border border-[#253354] bg-[#0b1222] p-3">
+              <table className="st w-full" role="table" aria-label="Revenue by country">
+                <thead>
+                  <tr>
+                    <th scope="col">Country</th>
+                    <th scope="col" className="text-right">Sales</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {countryData.map((row) => (
+                    <tr key={row.country}>
+                      <td>
+                        <div className="flex items-center gap-2">
+                          <span className="text-base leading-none">{getFlagEmoji(row.country)}</span>
+                          <span className="font-medium text-[#e5e7eb]">{row.country}</span>
+                        </div>
+                      </td>
+                      <td className="text-right font-semibold text-white">{formatCurrency(row.revenue)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

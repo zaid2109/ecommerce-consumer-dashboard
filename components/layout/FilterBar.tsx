@@ -20,6 +20,8 @@ const CATEGORIES = [
 ]
 
 const SEGMENTS = ['VIP', 'Regular', 'New', 'At-Risk', 'Churned']
+const COUNTRIES = ['United States', 'India', 'United Kingdom', 'Canada', 'Germany', 'France', 'Australia', 'Japan', 'Brazil', 'Singapore']
+const PAYMENT_METHODS = ['Credit Card', 'Debit Card', 'UPI', 'Net Banking', 'Wallet', 'Buy Now Pay Later', 'Cash on Delivery']
 const PRESETS = ['7D', '30D', '90D', '1Y', 'All'] as const
 
 function applyPresetDate(preset: (typeof PRESETS)[number]): [Date, Date] {
@@ -120,6 +122,8 @@ export function FilterBar() {
 
       <FilterDropdown label="Category" options={CATEGORIES} value={store.categories} onChange={store.setCategories} />
       <FilterDropdown label="Segment" options={SEGMENTS} value={store.segments} onChange={store.setSegments} />
+      <FilterDropdown label="Country" options={COUNTRIES} value={store.countries} onChange={store.setCountries} />
+      <FilterDropdown label="Payment" options={PAYMENT_METHODS} value={store.paymentMethods} onChange={store.setPaymentMethods} />
 
       {activeFilterCount > 0 && (
         <span className="pill bg-accent/10 text-accent">{activeFilterCount} active</span>

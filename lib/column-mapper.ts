@@ -3,7 +3,7 @@ import type { ColumnMapping } from './dataset-store'
 type AnalysisMapping = Partial<Record<keyof ColumnMapping, string | null>>
 
 const MAPPING_KEYS: (keyof ColumnMapping)[] = [
-  'date','revenue','category','customerName','customerSegment','country','quantity','unitPrice',
+  'orderId','date','revenue','category','customerName','customerSegment','country','quantity','unitPrice',
   'paymentMethod','paymentStatus','isReturned','returnReason','rating','discount','productName',
 ]
 

@@ -6,6 +6,7 @@ import KPICard from '@/components/cards/KPICard'
 import InsightBanner from '@/components/cards/InsightBanner'
 import RecommendedActions from '@/components/cards/RecommendedActions'
 import ChartInfoTooltip from '@/components/ui/ChartInfoTooltip'
+import WidgetErrorBoundary from '@/components/ui/WidgetErrorBoundary'
 import { useProductsData } from '@/hooks/useCommerceData'
 import { useFilterStore } from '@/lib/store'
 import { formatCurrency, formatNumber, formatPercent } from '@/lib/utils'
@@ -67,14 +68,18 @@ export default function ProductsPage() {
             <h3 className="sc-title">Category map</h3>
             <ChartInfoTooltip text="Compares category revenue footprint while encoding return pressure via color intensity." />
           </div>
-          <CategoryTreemap data={data.treemapData} onSelectCategory={(c) => setCategories([c])} />
+          <WidgetErrorBoundary title="Category map">
+            <CategoryTreemap data={data.treemapData} onSelectCategory={(c) => setCategories([c])} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc xl:col-span-3">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">Category trend</h3>
             <ChartInfoTooltip text="Shows 24-month stacked contribution by category to expose portfolio momentum shifts." />
           </div>
-          <CategoryAreaChart data={data.areaData} categories={data.categoryTable.map((r) => r.category)} />
+          <WidgetErrorBoundary title="Category trend">
+            <CategoryAreaChart data={data.areaData} categories={data.categoryTable.map((r) => r.category)} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -84,14 +89,18 @@ export default function ProductsPage() {
             <h3 className="sc-title">Category radar</h3>
             <ChartInfoTooltip text="Balances revenue, orders, pricing, rating, and return performance across selected categories." />
           </div>
-          <CategoryRadar data={data.radarData} />
+          <WidgetErrorBoundary title="Category radar">
+            <CategoryRadar data={data.radarData} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc xl:col-span-3">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">Price distribution</h3>
             <ChartInfoTooltip text="Visualizes pricing spread and median by category to identify outliers and margin opportunities." />
           </div>
-          <PriceBoxPlot data={data.boxPlotData} />
+          <WidgetErrorBoundary title="Price distribution">
+            <PriceBoxPlot data={data.boxPlotData} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -100,15 +109,19 @@ export default function ProductsPage() {
           <h3 className="sc-title">Gross vs returns</h3>
           <ChartInfoTooltip text="Compares gross revenue against return value to reveal true category net contribution." />
         </div>
-        <CategoryMarginBar data={data.marginData} />
+        <WidgetErrorBoundary title="Gross vs returns">
+          <CategoryMarginBar data={data.marginData} />
+        </WidgetErrorBoundary>
       </section>
 
-      <SimpleCsvTable
-        title="Category performance"
-        filename="products-category-performance.csv"
-        columns={['Category', 'Orders', 'Gross Revenue', 'Returns Value', 'Net Revenue', 'Return Rate%', 'Avg Rating', 'MoM Growth%']}
-        rows={tableRows}
-      />
+      <WidgetErrorBoundary title="Category performance table">
+        <SimpleCsvTable
+          title="Category performance"
+          filename="products-category-performance.csv"
+          columns={['Category', 'Orders', 'Gross Revenue', 'Returns Value', 'Net Revenue', 'Return Rate%', 'Avg Rating', 'MoM Growth%']}
+          rows={tableRows}
+        />
+      </WidgetErrorBoundary>
 
       <RecommendedActions actions={actions} />
     </div>

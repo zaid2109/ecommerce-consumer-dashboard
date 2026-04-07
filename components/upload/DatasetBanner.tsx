@@ -1,10 +1,30 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { FileText, X } from 'lucide-react'
 import { useDatasetStore } from '@/lib/dataset-store'
+import { fetchWithAuth } from '@/lib/auth-client'
 
 export function DatasetBanner() {
   const { meta, clearDataset } = useDatasetStore()
-  if (!meta) return null
+  const [latestDataset, setLatestDataset] = useState<{ name: string; rowCount: number; createdAt: string; status: string } | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+    fetchWithAuth('/api/datasets')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((payload) => {
+        if (!mounted || !payload?.datasets?.length) return
+        const d = payload.datasets[0] as { name: string; rowCount: number; createdAt: string; status: string }
+        setLatestDataset(d)
+      })
+      .catch(() => {})
+
+    return () => {
+      mounted = false
+    }
+  }, [meta?.uploadedAt])
+
+  if (!meta && !latestDataset) return null
 
   return (
     <div
@@ -21,9 +41,13 @@ export function DatasetBanner() {
     >
       <FileText size={14} style={{ color: '#4ade80', flexShrink: 0 }} />
       <div className="flex-1 min-w-0">
-        <span style={{ fontSize: 12, color: '#4ade80', fontWeight: 600, letterSpacing: '0.01em' }}>{meta.datasetType}</span>
+        <span style={{ fontSize: 12, color: '#4ade80', fontWeight: 600, letterSpacing: '0.01em' }}>
+          {meta?.datasetType ?? 'Uploaded Dataset'}
+        </span>
         <span style={{ fontSize: 12, color: '#6b7280', marginLeft: 8 }}>
-          {meta.fileName} · {meta.rowCount.toLocaleString()} rows · uploaded {new Date(meta.uploadedAt).toLocaleDateString()}
+          {meta
+            ? `${meta.fileName} · ${meta.rowCount.toLocaleString()} rows · uploaded ${new Date(meta.uploadedAt).toLocaleDateString()}`
+            : `${latestDataset?.name ?? 'Dataset'} · ${(latestDataset?.rowCount ?? 0).toLocaleString()} rows · status ${latestDataset?.status?.toLowerCase() ?? 'unknown'}`}
         </span>
       </div>
       <button

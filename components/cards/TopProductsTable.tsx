@@ -34,17 +34,17 @@ export function TopProductsTable({ data, title = 'Bestselling products' }: TopPr
         <tbody>
           {data.map((row, i) => (
             <tr key={`${row.category}-${i}`}>
-              <td className="text-tx-muted font-medium w-8">{i + 1}</td>
+              <td className="text-[#64748b] font-medium w-8">{i + 1}</td>
               <td>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ background: CHART_PALETTE[i % 6] }} />
-                  <span className="font-medium">{row.category}</span>
+                  <span className="font-medium text-[#e5e7eb]">{row.category}</span>
                 </div>
               </td>
-              <td className="text-right">{formatNumber(row.orders)}</td>
-              <td className="text-right font-medium">{formatCurrency(row.revenue)}</td>
-              <td className="text-right">
-                <span className={row.returnRate > 15 ? 'text-danger' : 'text-success'}>
+              <td className="text-right text-[#cbd5e1]">{formatNumber(row.orders)}</td>
+              <td className="text-right font-medium text-[#e5e7eb]">{formatCurrency(row.revenue)}</td>
+              <td className="text-right text-[#cbd5e1]">
+                <span>
                   {formatPercent(row.returnRate, 1)}
                 </span>
               </td>

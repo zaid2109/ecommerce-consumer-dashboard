@@ -57,6 +57,21 @@ function normalizeStatus(val: unknown): 'Completed' | 'Pending' | 'Failed' {
   return 'Completed'
 }
 
+function normalizeCategory(raw: unknown): Order['category'] {
+  const value = String(raw ?? '').trim().toLowerCase()
+  if (value.includes('elect')) return 'Electronics'
+  if (value.includes('cloth') || value.includes('apparel') || value.includes('fashion')) return 'Clothing'
+  if (value.includes('home') || value.includes('garden') || value.includes('furniture')) return 'Home & Garden'
+  if (value.includes('sport') || value.includes('fitness') || value.includes('outdoor')) return 'Sports'
+  if (value.includes('beaut') || value.includes('cosmetic') || value.includes('skin')) return 'Beauty'
+  if (value.includes('book') || value.includes('magazine')) return 'Books'
+  if (value.includes('toy') || value.includes('game')) return 'Toys'
+  if (value.includes('auto') || value.includes('car') || value.includes('vehicle')) return 'Automotive'
+  if (value.includes('food') || value.includes('grocery') || value.includes('beverage')) return 'Food'
+  if (value.includes('jewel') || value.includes('watch') || value.includes('accessor')) return 'Jewelry'
+  return 'Electronics'
+}
+
 export function transformDataset({ rows, mapping, dateFormat }: TransformOptions): { aggregated: PreAggregated; orders: Order[] } {
   const now = new Date()
   const twoYearsAgo = new Date(now)
@@ -93,7 +108,7 @@ export function transformDataset({ rows, mapping, dateFormat }: TransformOptions
 
     let date = parseDate(g(mapping.date), dateFormat)
     if (!date || !isValid(date)) {
-      date = new Date(twoYearsAgo.getTime() + Math.random() * (now.getTime() - twoYearsAgo.getTime()))
+      date = new Date(twoYearsAgo)
     }
 
     const quantity = Math.max(1, Math.round(toNumber(g(mapping.quantity)) || 1))
@@ -104,12 +119,13 @@ export function transformDataset({ rows, mapping, dateFormat }: TransformOptions
     }
     if (revenue <= 0) continue
 
-    const category = String(g(mapping.category) ?? g(mapping.productName) ?? 'Uncategorized').trim() || 'Uncategorized'
+    const category = normalizeCategory(g(mapping.category) ?? g(mapping.productName))
     const productName = String(g(mapping.productName) ?? category).trim() || category
     const customerName = String(g(mapping.customerName) ?? 'Unknown').trim() || 'Unknown'
     const customerEmail = `${customerName.toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^\.+|\.+$/g, '') || 'customer'}@example.com`
     const customerCity = 'Unknown'
     const customerId = `upl-${customerName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'customer'}`
+    const mappedOrderId = String(g(mapping.orderId) ?? '').trim()
 
     const rawSeg = String(g(mapping.customerSegment) ?? '').trim()
     const segMap: Record<string, string> = {
@@ -144,7 +160,7 @@ export function transformDataset({ rows, mapping, dateFormat }: TransformOptions
     const deliveryDays = 3
 
     normalized.push({
-      id: crypto.randomUUID(),
+      id: mappedOrderId || crypto.randomUUID(),
       customerId,
       date,
       revenue,
@@ -282,18 +298,6 @@ export function transformDataset({ rows, mapping, dateFormat }: TransformOptions
     topProducts,
   }
 
-  const allowedCategories: Order['category'][] = [
-    'Electronics',
-    'Clothing',
-    'Home & Garden',
-    'Sports',
-    'Beauty',
-    'Books',
-    'Toys',
-    'Automotive',
-    'Food',
-    'Jewelry',
-  ]
   const allowedMethods: Order['paymentMethod'][] = [
     'Credit Card',
     'Debit Card',
@@ -323,9 +327,7 @@ export function transformDataset({ rows, mapping, dateFormat }: TransformOptions
     customerCity: row.customerCity,
     customerCountry: row.country,
     orderDate: row.date,
-    category: allowedCategories.includes(row.category as Order['category'])
-      ? (row.category as Order['category'])
-      : 'Electronics',
+    category: normalizeCategory(row.category),
     productName: row.productName,
     quantity: Math.max(1, row.quantity),
     unitPrice: row.unitPrice > 0 ? row.unitPrice : row.revenue / Math.max(1, row.quantity),

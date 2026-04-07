@@ -27,21 +27,23 @@ export function ActivityFeed({ events }: ActivityFeedProps) {
   }, [])
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
       <h3 className="sc-title mb-3.5">Recent activity</h3>
-      {events.slice(0, 7).map((event) => (
-        <div key={event.id} className="flex items-start gap-3 border-b border-[#20293c] py-2.5 last:border-0">
-          <div className="h-8 w-8 shrink-0 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 text-[10px] font-bold text-white flex items-center justify-center">
-            {getInitials(event.text)}
+      <div className="flex-1 space-y-0">
+        {events.slice(0, 7).map((event) => (
+          <div key={event.id} className="flex items-start gap-3 border-b border-[#20293c] py-3.5 last:border-0">
+            <div className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 text-[11px] font-bold text-white flex items-center justify-center">
+              {getInitials(event.text)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[12.5px] text-[#e5e7eb] leading-snug">{event.text}</p>
+              <p className="mt-0.5 text-[11px] text-[#64748b]">
+                {mounted ? relativeTime(event.time) : event.time.toISOString().slice(0, 10)}
+              </p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] text-tx-primary dark:text-tx-inverse leading-snug">{event.text}</p>
-            <p className="mt-0.5 text-[11px] text-tx-muted">
-              {mounted ? relativeTime(event.time) : event.time.toISOString().slice(0, 10)}
-            </p>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }

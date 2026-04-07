@@ -7,6 +7,7 @@ import KPICard from '@/components/cards/KPICard'
 import InsightBanner from '@/components/cards/InsightBanner'
 import RecommendedActions from '@/components/cards/RecommendedActions'
 import ChartInfoTooltip from '@/components/ui/ChartInfoTooltip'
+import WidgetErrorBoundary from '@/components/ui/WidgetErrorBoundary'
 import { useCustomersPageData } from '@/hooks/useDashboardData'
 import { formatNumber } from '@/lib/utils'
 import { useDataset } from '@/hooks/useDataset'
@@ -56,14 +57,18 @@ export default function CustomersPage() {
             <h3 className="sc-title">Segment distribution</h3>
             <ChartInfoTooltip text="Shows customer mix by value segment to track health of loyalty and acquisition strategy." />
           </div>
-          <SegmentDonut data={data.donutData} />
+          <WidgetErrorBoundary title="Segment distribution">
+            <SegmentDonut data={data.donutData} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc xl:col-span-3">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">RFM scatter</h3>
             <ChartInfoTooltip text="Visualizes customer value by combining recency, frequency, and monetary behavior." />
           </div>
-          <RFMScatter data={data.scatterData} />
+          <WidgetErrorBoundary title="RFM scatter">
+            <RFMScatter data={data.scatterData} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -73,14 +78,18 @@ export default function CustomersPage() {
             <h3 className="sc-title">Segment revenue contribution</h3>
             <ChartInfoTooltip text="Shows monthly revenue contribution split by customer segments to guide retention spend." />
           </div>
-          <SegmentRevenueBar data={data.segmentRevenueData} />
+          <WidgetErrorBoundary title="Segment revenue contribution">
+            <SegmentRevenueBar data={data.segmentRevenueData} />
+          </WidgetErrorBoundary>
         </article>
         <article className="sc xl:col-span-2">
           <div className="mb-4 flex items-center gap-2">
             <h3 className="sc-title">CLV distribution</h3>
             <ChartInfoTooltip text="Highlights customer lifetime value spread to identify high-value growth and long-tail risk." />
           </div>
-          <CLVHistogram data={data.clvHistogramData} />
+          <WidgetErrorBoundary title="CLV distribution">
+            <CLVHistogram data={data.clvHistogramData} />
+          </WidgetErrorBoundary>
         </article>
       </section>
 
@@ -89,10 +98,14 @@ export default function CustomersPage() {
           <h3 className="sc-title">Revenue treemap by country</h3>
           <ChartInfoTooltip text="Shows market concentration by country to prioritize localization and expansion strategy." />
         </div>
-        <CountryTreemap data={data.treemapData} />
+        <WidgetErrorBoundary title="Revenue treemap by country">
+          <CountryTreemap data={data.treemapData} />
+        </WidgetErrorBoundary>
       </section>
 
-      <CustomersTable rows={data.tableRows} />
+      <WidgetErrorBoundary title="Customers table">
+        <CustomersTable rows={data.tableRows} />
+      </WidgetErrorBoundary>
       <RecommendedActions actions={actions} />
     </div>
   )

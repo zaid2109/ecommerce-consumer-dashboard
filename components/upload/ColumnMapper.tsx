@@ -19,6 +19,7 @@ interface ColumnMapperProps {
 }
 
 const MAPPING_LABELS: { key: keyof ColumnMapping; label: string; required: boolean }[] = [
+  { key: 'orderId', label: 'Order ID', required: true },
   { key: 'date', label: 'Order Date', required: true },
   { key: 'revenue', label: 'Revenue / Amount', required: true },
   { key: 'category', label: 'Category', required: false },
@@ -36,6 +37,7 @@ const MAPPING_LABELS: { key: keyof ColumnMapping; label: string; required: boole
 export function ColumnMapper({ analysis, onConfirm, onBack }: ColumnMapperProps) {
   const [mapping, setMapping] = useState<ColumnMapping>(analysis.columnMapping)
   const [showAll, setShowAll] = useState(false)
+  const canProceed = Boolean(mapping.orderId && mapping.date && mapping.revenue)
 
   const visibleFields = showAll ? MAPPING_LABELS : MAPPING_LABELS.slice(0, 6)
   const confidenceColor = { high: '#4ade80', medium: '#fb923c', low: '#f87171' }[analysis.confidence]
@@ -129,18 +131,18 @@ export function ColumnMapper({ analysis, onConfirm, onBack }: ColumnMapperProps)
         </button>
         <button
           onClick={() => onConfirm(mapping)}
-          disabled={!mapping.date && !mapping.revenue}
+          disabled={!canProceed}
           className="ui-focus"
           style={{
             flex: 2,
             padding: '9px 0',
             borderRadius: 8,
-            background: !mapping.date && !mapping.revenue ? '#1e2433' : '#4ade80',
+            background: !canProceed ? '#1e2433' : '#4ade80',
             border: 'none',
             fontSize: 13,
             fontWeight: 600,
-            color: !mapping.date && !mapping.revenue ? '#4b5563' : '#0d0f14',
-            cursor: !mapping.date && !mapping.revenue ? 'not-allowed' : 'pointer',
+            color: !canProceed ? '#4b5563' : '#0d0f14',
+            cursor: !canProceed ? 'not-allowed' : 'pointer',
             transition: 'all 0.2s',
           }}
         >

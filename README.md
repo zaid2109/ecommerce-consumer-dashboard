@@ -38,6 +38,13 @@ cp .env.example .env.local
 Set required values in `.env.local`:
 
 - `ANTHROPIC_API_KEY` (required for dataset analysis API paths that use Anthropic)
+- `JWT_SECRET` (required for access token verification)
+- `DATABASE_URL` (required for Prisma persistence and integration checks)
+- `CONNECTOR_ENCRYPTION_KEY` (required for encrypted connector secrets at rest)
+
+Optional:
+
+- `CSP_ALLOW_UNSAFE_INLINE` (set `true` only for temporary compatibility; strict production should keep this `false`/unset)
 
 ### 3) Generate static data
 
