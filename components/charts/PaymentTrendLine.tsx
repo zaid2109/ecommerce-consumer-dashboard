@@ -3,6 +3,7 @@
 import { memo, useEffect, useRef } from 'react'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { CHART_PALETTE } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type PaymentTrendLineProps = { data: Array<Record<string, number | string>>; methods: string[] }
 
@@ -17,7 +18,7 @@ export const PaymentTrendLine = memo(function PaymentTrendLine({ data, methods }
       <LineChart data={data}>
         <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6b7280' }} />
         <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
-        <Tooltip />
+        <Tooltip content={(props) => <SpireTooltip {...props} />} />
         {methods.map((m, i) => (
           <Line key={m} dataKey={m} type="monotone" stroke={CHART_PALETTE[i % CHART_PALETTE.length]} dot={false} isAnimationActive={!hasAnimated.current} />
         ))}

@@ -3,6 +3,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Area, AreaChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { CHART_PALETTE } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type CategoryAreaChartProps = {
   data: Array<Record<string, number | string>>
@@ -39,7 +40,7 @@ export const CategoryAreaChart = memo(function CategoryAreaChart({ data, categor
         <AreaChart data={data}>
           <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6b7280' }} />
           <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
-          <Tooltip />
+          <Tooltip content={(props) => <SpireTooltip {...props} />} />
           <Legend />
           {activeCategories.map((category, i) => (
             <Area

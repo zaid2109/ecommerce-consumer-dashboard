@@ -3,6 +3,7 @@
 import { memo, useEffect, useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { CHART_PALETTE } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type PaymentShareDonutProps = { data: { name: string; value: number }[] }
 
@@ -22,7 +23,7 @@ export const PaymentShareDonut = memo(function PaymentShareDonut({ data }: Payme
             <Cell key={entry.name} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />
           ))}
         </Pie>
-        <Tooltip />
+        <Tooltip content={(props) => <SpireTooltip {...props} />} />
       </PieChart>
     </ResponsiveContainer>
   )

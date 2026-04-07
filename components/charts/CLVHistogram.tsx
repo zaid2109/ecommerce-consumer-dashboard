@@ -3,6 +3,7 @@
 import { memo, useEffect, useRef } from 'react'
 import { Bar, BarChart, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { formatNumber } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type CLVHistogramProps = {
   data: { bin: string; count: number }[]
@@ -20,7 +21,7 @@ export const CLVHistogram = memo(function CLVHistogram({ data }: CLVHistogramPro
       <BarChart data={data}>
         <XAxis dataKey="bin" tick={{ fontSize: 12, fill: '#6b7280' }} />
         <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
-        <Tooltip formatter={(v: number) => formatNumber(v)} />
+        <Tooltip content={(props) => <SpireTooltip {...props} formatter={(v: number) => formatNumber(v)} />} />
         <Bar dataKey="count" fill="#6366f1" radius={[8, 8, 0, 0]} isAnimationActive={!hasAnimated.current}>
           <LabelList dataKey="count" position="top" formatter={(v: number) => formatNumber(v)} />
         </Bar>

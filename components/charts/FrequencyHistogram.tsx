@@ -3,6 +3,7 @@
 import { memo, useEffect, useMemo, useRef } from 'react'
 import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { getColor, formatNumber } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type FrequencyHistogramProps = {
   data: { bucket: string; count: number }[]
@@ -29,7 +30,7 @@ export const FrequencyHistogram = memo(function FrequencyHistogram({ data }: Fre
       <BarChart data={colored}>
         <XAxis dataKey="bucket" tick={{ fontSize: 12, fill: '#6b7280' }} />
         <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
-        <Tooltip formatter={(value: number) => formatNumber(value)} />
+        <Tooltip content={(props) => <SpireTooltip {...props} formatter={(value: number) => formatNumber(value)} />} />
         <Bar dataKey="count" radius={[8, 8, 0, 0]} isAnimationActive={!hasAnimated.current}>
           {colored.map((entry) => (
             <Cell key={entry.bucket} fill={entry.fill} />

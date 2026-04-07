@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef } from 'react'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import SpireTooltip from './ChartTooltip'
 
 type AvgTransactionBarProps = { data: { method: string; value: number }[] }
 
@@ -16,7 +17,7 @@ export const AvgTransactionBar = memo(function AvgTransactionBar({ data }: AvgTr
       <BarChart data={data}>
         <XAxis dataKey="method" tick={{ fontSize: 12 }} />
         <YAxis tick={{ fontSize: 12 }} />
-        <Tooltip />
+        <Tooltip content={(props) => <SpireTooltip {...props} />} />
         <Bar dataKey="value" fill="#6366f1" isAnimationActive={!hasAnimated.current} />
       </BarChart>
     </ResponsiveContainer>

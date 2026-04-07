@@ -1,14 +1,7 @@
 'use client'
 import { memo, useRef, useEffect } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
-const DarkTooltip = ({ active, payload }: any) => {
-  if (!active || !payload?.length) return null
-  return (
-    <div style={{ background:'#141820', border:'1px solid #1e2433', borderRadius:8, padding:'8px 12px', fontSize:12 }}>
-      <p style={{ color: payload[0]?.payload?.color, fontWeight:600 }}>{payload[0]?.name}: {payload[0]?.value?.toLocaleString()}</p>
-    </div>
-  )
-}
+import SpireTooltip from './ChartTooltip'
 export const OrderStatusDonut = memo(({ data }: { data: { name: string; value: number; color: string }[] }) => {
   const hasAnimated = useRef(false)
   useEffect(() => { hasAnimated.current = true }, [])
@@ -21,7 +14,7 @@ export const OrderStatusDonut = memo(({ data }: { data: { name: string; value: n
             <Pie data={data} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value" isAnimationActive={!hasAnimated.current}>
               {data.map((entry, i) => <Cell key={i} fill={entry.color} stroke="none" />)}
             </Pie>
-            <Tooltip content={<DarkTooltip />} />
+            <Tooltip content={(props) => <SpireTooltip {...props} />} />
           </PieChart>
         </ResponsiveContainer>
         <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', pointerEvents:'none' }}>

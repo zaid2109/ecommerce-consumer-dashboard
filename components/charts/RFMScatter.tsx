@@ -3,6 +3,7 @@
 import { memo, useEffect, useRef } from 'react'
 import { CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from 'recharts'
 import { formatCurrency } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type ScatterPoint = {
   name: string
@@ -44,8 +45,13 @@ export const RFMScatter = memo(function RFMScatter({ data }: RFMScatterProps) {
         <YAxis type="number" dataKey="monetary" name="Spend" tick={{ fontSize: 12, fill: '#6b7280' }} />
         <ZAxis type="number" dataKey="recency" range={[30, 180]} />
         <Tooltip
+          content={(props) => (
+            <SpireTooltip
+              {...props}
+              formatter={(value: number, key: string) => (key === 'monetary' ? formatCurrency(value) : value)}
+            />
+          )}
           cursor={{ strokeDasharray: '3 3' }}
-          formatter={(value: number, key: string) => (key === 'monetary' ? formatCurrency(value) : value)}
           labelFormatter={(_, payload) => {
             const point = payload?.[0]?.payload as ScatterPoint | undefined
             return point ? `${point.name} • ${point.segment}` : ''

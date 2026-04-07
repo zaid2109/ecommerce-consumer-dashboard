@@ -3,6 +3,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { CHART_PALETTE } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type Row = {
   category: string
@@ -73,7 +74,7 @@ export const CategoryRadar = memo(function CategoryRadar({ data }: CategoryRadar
         <RadarChart data={radarData}>
           <PolarGrid />
           <PolarAngleAxis dataKey="metric" />
-          <Tooltip />
+          <Tooltip content={(props) => <SpireTooltip {...props} />} />
           {selected.map((cat, i) => (
             <Radar
               key={cat}

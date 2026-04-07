@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useMemo, useRef } from 'react'
 import { Line, LineChart, ResponsiveContainer, ReferenceDot, Tooltip, XAxis, YAxis } from 'recharts'
+import SpireTooltip from './ChartTooltip'
 
 type ReturnTimelineLineProps = { data: { day: number; count: number }[] }
 
@@ -18,7 +19,7 @@ export const ReturnTimelineLine = memo(function ReturnTimelineLine({ data }: Ret
       <LineChart data={data}>
         <XAxis dataKey="day" />
         <YAxis />
-        <Tooltip />
+        <Tooltip content={(props) => <SpireTooltip {...props} />} />
         <Line dataKey="count" stroke="#6366f1" dot={false} isAnimationActive={!hasAnimated.current} />
         {peak ? <ReferenceDot x={peak.day} y={peak.count} r={5} fill="#ef4444" label={`Peak Day ${peak.day}`} /> : null}
       </LineChart>

@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef } from 'react'
 import { Bar, BarChart, Cell, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import SpireTooltip from './ChartTooltip'
 
 type ReturnRateCategoryBarProps = { data: { category: string; rate: number }[] }
 
@@ -16,7 +17,7 @@ export const ReturnRateCategoryBar = memo(function ReturnRateCategoryBar({ data 
       <BarChart data={data}>
         <XAxis dataKey="category" tick={{ fontSize: 12 }} />
         <YAxis tick={{ fontSize: 12 }} />
-        <Tooltip />
+        <Tooltip content={(props) => <SpireTooltip {...props} />} />
         <ReferenceLine y={12} stroke="#111827" strokeDasharray="3 3" />
         <Bar dataKey="rate" isAnimationActive={!hasAnimated.current}>
           {data.map((d) => (

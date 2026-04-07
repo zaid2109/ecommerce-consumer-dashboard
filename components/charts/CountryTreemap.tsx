@@ -3,6 +3,7 @@
 import { memo, useEffect, useMemo, useRef } from 'react'
 import { ResponsiveContainer, Tooltip, Treemap } from 'recharts'
 import { formatCurrency } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type CountryTreemapProps = {
   data: { name: string; size: number }[]
@@ -28,7 +29,7 @@ export const CountryTreemap = memo(function CountryTreemap({ data }: CountryTree
   return (
     <ResponsiveContainer width="100%" height={300}>
       <Treemap data={colored} dataKey="size" stroke="#fff" isAnimationActive={!hasAnimated.current}>
-        <Tooltip formatter={(v: number) => formatCurrency(v)} />
+        <Tooltip content={(props) => <SpireTooltip {...props} formatter={(v: number) => formatCurrency(v)} />} />
       </Treemap>
     </ResponsiveContainer>
   )

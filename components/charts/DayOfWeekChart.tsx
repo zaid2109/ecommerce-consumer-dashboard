@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef } from 'react'
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from 'recharts'
+import SpireTooltip from './ChartTooltip'
 
 type DayOfWeekChartProps = {
   data: { day: string; orders: number }[]
@@ -26,7 +27,7 @@ export const DayOfWeekChart = memo(function DayOfWeekChart({ data }: DayOfWeekCh
           fillOpacity={0.3}
           isAnimationActive={!hasAnimated.current}
         />
-        <Tooltip />
+        <Tooltip content={(props) => <SpireTooltip {...props} />} />
       </RadarChart>
     </ResponsiveContainer>
   )

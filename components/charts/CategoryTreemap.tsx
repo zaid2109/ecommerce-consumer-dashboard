@@ -3,6 +3,7 @@
 import { memo, useEffect, useMemo, useRef } from 'react'
 import { ResponsiveContainer, Tooltip, Treemap } from 'recharts'
 import { interpolateColor } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type Node = { name: string; size: number; returnRate: number }
 
@@ -38,7 +39,7 @@ export const CategoryTreemap = memo(function CategoryTreemap({ data, onSelectCat
           if (node?.name && onSelectCategory) onSelectCategory(node.name)
         }}
       >
-        <Tooltip formatter={(value: number) => value.toFixed(0)} />
+        <Tooltip content={(props) => <SpireTooltip {...props} formatter={(value: number) => value.toFixed(0)} />} />
       </Treemap>
     </ResponsiveContainer>
   )

@@ -3,6 +3,7 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { formatCurrency } from '@/lib/utils'
+import SpireTooltip from './ChartTooltip'
 
 type MovingAverageChartProps = {
   data: { date: string; raw: number; ma7: number; ma30: number }[]
@@ -36,7 +37,7 @@ export const MovingAverageChart = memo(function MovingAverageChart({ data }: Mov
         <LineChart data={data}>
           <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#6b7280' }} />
           <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
-          <Tooltip formatter={(v: number) => formatCurrency(v)} />
+          <Tooltip content={(props) => <SpireTooltip {...props} formatter={(v: number) => formatCurrency(v)} />} />
           <Line
             type="monotone"
             dataKey="raw"

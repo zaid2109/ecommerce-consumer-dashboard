@@ -2,15 +2,7 @@
 import { memo, useRef, useEffect } from 'react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useChartTheme } from '@/hooks/useChartTheme'
-const DarkTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload?.length) return null
-  return (
-    <div style={{ background:'#141820', border:'1px solid #1e2433', borderRadius:8, padding:'8px 12px', fontSize:12 }}>
-      <p style={{ color:'#9ca3af', marginBottom:4 }}>{label}</p>
-      <p style={{ color:'#4ade80', fontWeight:600 }}>{payload[0]?.value?.toLocaleString()} orders</p>
-    </div>
-  )
-}
+import SpireTooltip from './ChartTooltip'
 export const OrdersAreaChart = memo(({ data }: { data: { date: string; orders: number }[] }) => {
   const hasAnimated = useRef(false)
   useEffect(() => { hasAnimated.current = true }, [])
@@ -28,7 +20,7 @@ export const OrdersAreaChart = memo(({ data }: { data: { date: string; orders: n
           <CartesianGrid vertical={false} stroke={gridColor} strokeDasharray="0" />
           <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize:10, fill:textColor, fontFamily:'Inter' }} interval={14} />
           <YAxis axisLine={false} tickLine={false} tick={{ fontSize:10, fill:textColor }} width={35} />
-          <Tooltip content={<DarkTooltip />} cursor={{ stroke:'#4ade80', strokeWidth:1, strokeDasharray:'4 4' }} />
+          <Tooltip content={(props) => <SpireTooltip {...props} />} cursor={{ stroke:'#4ade80', strokeWidth:1, strokeDasharray:'4 4' }} />
           <Area type="monotone" dataKey="orders" stroke="#4ade80" strokeWidth={2} fill="url(#ordersGrad)" dot={false} isAnimationActive={!hasAnimated.current} />
         </AreaChart>
       </ResponsiveContainer>

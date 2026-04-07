@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef } from 'react'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import SpireTooltip from './ChartTooltip'
 
 type ReturnBySegmentBarProps = { data: { segment: string; returned: number; notReturned: number }[] }
 
@@ -15,7 +16,7 @@ export const ReturnBySegmentBar = memo(function ReturnBySegmentBar({ data }: Ret
       <BarChart data={data}>
         <XAxis dataKey="segment" />
         <YAxis />
-        <Tooltip />
+        <Tooltip content={(props) => <SpireTooltip {...props} />} />
         <Bar dataKey="returned" fill="#ef4444" isAnimationActive={!hasAnimated.current} />
         <Bar dataKey="notReturned" fill="#10b981" isAnimationActive={!hasAnimated.current} />
       </BarChart>
