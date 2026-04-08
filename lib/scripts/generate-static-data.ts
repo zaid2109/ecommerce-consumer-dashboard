@@ -2,7 +2,6 @@ import { writeFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
 
 // Import the generator (runs synchronously)
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { aggregated, orders } = require('../data-generator')
 
 const outputDir = join(process.cwd(), 'public', 'data')
