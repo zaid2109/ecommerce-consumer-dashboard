@@ -4,6 +4,8 @@ import { Loader2, FileText, Brain } from 'lucide-react'
 const STEPS = [
   { key: 'parsing', icon: FileText, label: 'Parsing file', sub: 'Reading rows and columns...' },
   { key: 'analyzing', icon: Brain, label: 'AI analyzing columns', sub: 'Claude is mapping your data...' },
+  { key: 'queueing', icon: FileText, label: 'Queueing ingestion', sub: 'Creating dataset ingestion job...' },
+  { key: 'processing', icon: Loader2, label: 'Processing dataset', sub: 'Running async ingestion pipeline...' },
 ]
 
 export function UploadProgress({ step }: { step: string }) {

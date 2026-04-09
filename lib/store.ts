@@ -21,6 +21,7 @@ export interface FilterActions {
   setCountries: (v: string[]) => void
   setPaymentMethods: (v: string[]) => void
   setActivePage: (p: string) => void
+  applySavedFilters: (state: Omit<FilterState, 'activePage'>) => void
   resetFilters: () => void
 }
 
@@ -42,6 +43,14 @@ export const useFilterStore = create<FilterState & FilterActions>((set) => ({
   setCountries: (v) => set({ countries: v }),
   setPaymentMethods: (v) => set({ paymentMethods: v }),
   setActivePage: (p) => set({ activePage: p }),
+  applySavedFilters: (state) =>
+    set({
+      dateRange: state.dateRange,
+      categories: state.categories,
+      segments: state.segments,
+      countries: state.countries,
+      paymentMethods: state.paymentMethods,
+    }),
   resetFilters: () =>
     set({
       dateRange: [twoYearsAgo, now],

@@ -24,6 +24,19 @@ interface AnalyzeResult {
   confidence: 'high' | 'medium' | 'low'
 }
 
+type DatasetCreateResponse = {
+  dataset: { id: string; status: string }
+  job: { id: string; status: string }
+  idempotentReplay?: boolean
+}
+
+type JobStatusResponse = {
+  status: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+  progress: number
+  error?: string | null
+  result?: { datasetId?: string }
+}
+
 function formatUploadError(message: string): string {
   const clean = message.trim()
   if (!clean) return 'Upload failed. Please try again.'
@@ -32,6 +45,14 @@ function formatUploadError(message: string): string {
   }
   if (clean.length > 220) return `${clean.slice(0, 217)}...`
   return clean
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const bytes = new TextEncoder().encode(input)
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes)
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
 }
 
 export function UploadModal({ onClose }: UploadModalProps) {
@@ -47,15 +68,33 @@ export function UploadModal({ onClose }: UploadModalProps) {
 
   const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 
+  const pollJobUntilComplete = useCallback(async (jobId: string): Promise<JobStatusResponse> => {
+    const maxAttempts = 180
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const statusRes = await fetchWithAuth(`/api/jobs/${jobId}/status`, { cache: 'no-store' })
+      if (!statusRes.ok) {
+        const err = await statusRes.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Failed to read ingestion status')
+      }
+      const statusPayload = (await statusRes.json()) as JobStatusResponse
+      if (statusPayload.status === 'COMPLETED') return statusPayload
+      if (statusPayload.status === 'FAILED') {
+        throw new Error(statusPayload.error ?? 'Ingestion failed')
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
+    throw new Error('Ingestion timed out')
+  }, [])
+
   const processFile = useCallback(async (file: File) => {
-    const allowedTypes = ['.csv', '.xlsx', '.xls', '.tsv', '.json']
+    const allowedTypes = ['.csv', '.xlsx', '.tsv', '.json']
     const filename = file.name.toLowerCase()
     const isAllowed = allowedTypes.some(ext => filename.endsWith(ext))
 
     if (!isAllowed) {
       store.setUploadError(
         `Unsupported file type "${file.name.split('.').pop()}". ` +
-        `Please upload a CSV, Excel (.xlsx/.xls), TSV, or JSON file.`
+        `Please upload a CSV, Excel (.xlsx), TSV, or JSON file.`
       )
       return
     }
@@ -92,8 +131,8 @@ export function UploadModal({ onClose }: UploadModalProps) {
       }
 
       const { columns, rowCount, sample, fileName, parseFingerprint, rawArtifactKey, processedArtifactKey, processedMetrics } = await parseRes.json()
-      const idempotencyKey = String(parseFingerprint ?? '')
-      if (!idempotencyKey) {
+      const parseBaseFingerprint = String(parseFingerprint ?? '')
+      if (!parseBaseFingerprint) {
         throw new Error('Parser did not return a fingerprint')
       }
 
@@ -117,6 +156,10 @@ export function UploadModal({ onClose }: UploadModalProps) {
         insights: analysisRaw.insights ?? [],
         missingColumns: analysisRaw.missingColumns ?? [],
       }
+      store.setUploadStep('queueing')
+      const mappingFingerprint = await sha256Hex(JSON.stringify(analysis.columnMapping))
+      const idempotencyKey = `${parseBaseFingerprint}:${mappingFingerprint}`
+
       const datasetsRes = await fetchWithAuth('/api/datasets', {
         method: 'POST',
         headers: withCsrfHeader({
@@ -145,6 +188,13 @@ export function UploadModal({ onClose }: UploadModalProps) {
         const err = await datasetsRes.json()
         throw new Error(err.error ?? 'Failed to create dataset')
       }
+      const created = (await datasetsRes.json()) as DatasetCreateResponse
+      if (!created.job?.id) {
+        throw new Error('Missing ingestion job id from dataset create response')
+      }
+
+      store.setUploadStep('processing')
+      await pollJobUntilComplete(created.job.id)
 
       setAiResult({ ...analysis, rowCount, fileName, columns })
       store.setColumnMapping(analysis.columnMapping)
@@ -154,6 +204,9 @@ export function UploadModal({ onClose }: UploadModalProps) {
         columns,
         uploadedAt: new Date().toISOString(),
         datasetType: analysis.datasetType,
+        datasetId: created.dataset.id,
+        jobId: created.job.id,
+        status: 'READY',
         aiInsights: analysis.insights ?? [],
         suggestedKPIs: analysis.suggestedKPIs ?? [],
       })
@@ -164,7 +217,7 @@ export function UploadModal({ onClose }: UploadModalProps) {
       store.setUploadError(formatUploadError(message))
       store.setIsUploading(false)
     }
-  }, [store])
+  }, [MAX_FILE_SIZE, pollJobUntilComplete, store])
 
   const handleConfirmMapping = useCallback(async (mapping: ColumnMapping) => {
     try {
@@ -225,9 +278,9 @@ export function UploadModal({ onClose }: UploadModalProps) {
             >
               <div className="w-12 h-12 rounded-full bg-[#1a2233] border border-[#2a3246] flex items-center justify-center mx-auto mb-3"><Upload size={20} className="text-[#4ade80]" /></div>
               <p className="text-[14px] font-medium text-[#f1f5f9] mb-1">Drop your file here</p>
-              <p className="text-[12px] text-[#6b7280]">or click to browse — CSV, XLSX, XLS, TSV, JSON</p>
-              <p className="text-[11px] text-[#4b5563] mt-3">Up to 100,000 rows · AI auto-detects column types</p>
-              <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls,.tsv,.json" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) processFile(file) }} />
+              <p className="text-[12px] text-[#6b7280]">or click to browse — CSV, XLSX, TSV, JSON</p>
+              <p className="text-[11px] text-[#4b5563] mt-3">Large files supported · AI auto-detects column types</p>
+              <input ref={fileRef} type="file" accept=".csv,.xlsx,.tsv,.json" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) processFile(file) }} />
             </div>
           ) : null}
 

@@ -85,13 +85,19 @@ export async function POST(req: NextRequest) {
   })
 
   const response = NextResponse.json({
-    accessToken: session.accessToken,
     user: {
       id: user.id,
       email: user.email,
       role: user.role,
       workspaceId: user.workspaceId,
     },
+  })
+  response.cookies.set('access_token', session.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+    expires: session.expiresAt,
   })
 
   response.cookies.set('refresh_token', session.refreshToken, {

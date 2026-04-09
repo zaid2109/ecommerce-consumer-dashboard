@@ -5,6 +5,7 @@ import type { Order } from '@/lib/types'
 import { useFilterStore } from '@/lib/store'
 import { getColor } from '@/lib/utils'
 import { useDataset } from './useDataset'
+import { KPI_FORMULAS } from '@/lib/kpi-formulas'
 
 type RevenuePoint = { date: string; gross: number; net: number }
 type WeeklyPerformancePoint = { day: string; revenue: number; returns: number }
@@ -218,9 +219,9 @@ export function useCategoryData() {
   }))
 
   return useMemo(() => {
-    const categoryTotals = new Map<Order['category'], { orders: number; revenue: number }>()
+    const categoryTotals = new Map<Order['category'], { orders: number; returns: number; revenue: number }>()
     for (const category of CATEGORY_LIST) {
-      categoryTotals.set(category, { orders: 0, revenue: 0 })
+      categoryTotals.set(category, { orders: 0, returns: 0, revenue: 0 })
     }
 
     for (const order of orders) {
@@ -228,6 +229,7 @@ export function useCategoryData() {
       const totals = categoryTotals.get(order.category)
       if (!totals) continue
       totals.orders += 1
+      if (order.isReturned) totals.returns += 1
       totals.revenue += order.revenue
     }
 
@@ -240,7 +242,7 @@ export function useCategoryData() {
           category,
           orders: totals.orders,
           revenue: totals.revenue,
-          returnRate: (aggregated.returnRateByCategory[category] ?? 0) * 100,
+          returnRate: KPI_FORMULAS.returnRatePercent(totals.orders, totals.returns),
           trend,
           color: getColor(index),
         }

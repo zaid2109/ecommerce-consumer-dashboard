@@ -7,6 +7,7 @@ import fs from 'fs'
 import fsp from 'fs/promises'
 import os from 'os'
 import path from 'path'
+import { Readable } from 'stream'
 import { canAccess, readAuthContext } from '@/lib/server/auth'
 import { enforceCsrf } from '@/lib/server/security'
 import { createRequestLogContext } from '@/lib/server/logger'
@@ -20,7 +21,6 @@ const MAX_UPLOAD_BYTES = 500 * 1024 * 1024
 const UPLOAD_WINDOW_MS = 60_000
 const UPLOAD_LIMIT_PER_WINDOW = 10
 const uploadRateStore = new Map<string, number[]>()
-const MAX_RETURNED_ROWS = 100_000
 const AV_SCANNER_ENABLED = process.env.ENABLE_AV_SCAN === 'true'
 const BLOCKED_MIME_PREFIXES = ['application/x-msdownload', 'application/x-dosexec']
 
@@ -140,7 +140,25 @@ async function parseMultipart(req: NextRequest): Promise<{ fileName: string; mim
   }
 }
 
-async function parseDelimitedFile(filePath: string, separator: ',' | '\t'): Promise<Record<string, unknown>[]> {
+function decodeTextBuffer(buffer: Buffer): { text: string; encoding: 'utf-8' | 'windows-1252' | 'latin1' } {
+  const utf8Decoder = new TextDecoder('utf-8', { fatal: true })
+  try {
+    return { text: utf8Decoder.decode(buffer), encoding: 'utf-8' }
+  } catch {
+    // fallback
+  }
+
+  try {
+    const win1252 = new TextDecoder('windows-1252', { fatal: false })
+    return { text: win1252.decode(buffer), encoding: 'windows-1252' }
+  } catch {
+    // fallback
+  }
+
+  return { text: buffer.toString('latin1'), encoding: 'latin1' }
+}
+
+async function parseDelimitedText(text: string, separator: ',' | '\t'): Promise<Record<string, unknown>[]> {
   const parser = parseCsvStream({
     columns: true,
     skip_empty_lines: true,
@@ -150,7 +168,7 @@ async function parseDelimitedFile(filePath: string, separator: ',' | '\t'): Prom
     relax_quotes: true,
   })
   const rows: Record<string, unknown>[] = []
-  const stream = fs.createReadStream(filePath, { encoding: 'utf8' })
+  const stream = Readable.from([text])
 
   await new Promise<void>((resolve, reject) => {
     stream
@@ -237,11 +255,11 @@ export async function POST(req: NextRequest) {
 
     const filename = fileName.toLowerCase()
     const mimeType = parsedMultipart.mimeType
-    const allowedTypes = ['.csv', '.xlsx', '.xls', '.tsv', '.json']
+    const allowedTypes = ['.csv', '.xlsx', '.tsv', '.json']
     const isAllowed = allowedTypes.some((ext) => filename.endsWith(ext))
     if (!isAllowed) {
       requestLog.finish(400, { workspace_id: auth.workspaceId, user_id: auth.userId })
-      return NextResponse.json({ error: 'Unsupported file type. Please upload CSV, Excel, TSV, or JSON.' }, { status: 400 })
+      return NextResponse.json({ error: 'Unsupported file type. Please upload CSV, XLSX, TSV, or JSON.' }, { status: 400 })
     }
 
     const allowedMimes = new Set([
@@ -271,6 +289,13 @@ export async function POST(req: NextRequest) {
       requestLog.finish(400, { workspace_id: auth.workspaceId, user_id: auth.userId })
       return NextResponse.json({ error: 'File content does not match extension.' }, { status: 400 })
     }
+    if (filename.endsWith('.xls') || sniffKind === 'xls') {
+      requestLog.finish(400, { workspace_id: auth.workspaceId, user_id: auth.userId })
+      return NextResponse.json(
+        { error: 'Legacy .xls files are not supported. Please convert and upload as .xlsx, CSV, TSV, or JSON.' },
+        { status: 400 }
+      )
+    }
 
     const buffer = await fsp.readFile(parsedMultipart.filePath)
     const scan = await runAntivirusScan(fileName, buffer)
@@ -280,10 +305,11 @@ export async function POST(req: NextRequest) {
     }
     let rows: Record<string, unknown>[] = []
     let columns: string[] = []
+    const decodedText = decodeTextBuffer(buffer)
 
     if (filename.endsWith('.csv') || filename.endsWith('.tsv')) {
       const separator = filename.endsWith('.tsv') ? '\t' : ','
-      const records = await parseDelimitedFile(parsedMultipart.filePath, separator as ',' | '\t')
+      const records = await parseDelimitedText(decodedText.text, separator as ',' | '\t')
       if (records.length < 1) {
         requestLog.finish(400, { workspace_id: auth.workspaceId, user_id: auth.userId })
         return NextResponse.json({ error: 'File appears empty or has only headers.' }, { status: 400 })
@@ -329,8 +355,7 @@ export async function POST(req: NextRequest) {
         }
       })
     } else if (filename.endsWith('.json')) {
-      const text = buffer.toString('utf-8')
-      const parsed = JSON.parse(text) as unknown
+      const parsed = JSON.parse(decodedText.text) as unknown
       rows = (Array.isArray(parsed) ? parsed : [parsed]) as Record<string, unknown>[]
       columns = rows.length > 0 ? Object.keys(rows[0]) : []
     }
@@ -340,28 +365,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No data rows found in file.' }, { status: 400 })
     }
 
-    const cappedRows = rows.slice(0, MAX_RETURNED_ROWS)
-    const sample = cappedRows.slice(0, 50)
+    const sample = rows.slice(0, 50)
     const parseFingerprint = parsedMultipart.fingerprint
     const safeFileName = fileName.replace(/[^\w.-]+/g, '_')
     const rawArtifactKey = `workspace/${auth.workspaceId}/raw/${parseFingerprint}-${safeFileName}.json`
     const processedArtifactKey = `workspace/${auth.workspaceId}/processed/${parseFingerprint}.json`
     const processedMetrics = {
-      rowCount: cappedRows.length,
+      rowCount: rows.length,
       columnCount: columns.length,
       parser: filename.endsWith('.csv') || filename.endsWith('.tsv') ? 'csv' : filename.endsWith('.json') ? 'json' : 'excel',
+      sourceEncoding: decodedText.encoding,
     }
-    await writeJsonArtifact(rawArtifactKey, { rows: cappedRows, columns, fileName })
+    await writeJsonArtifact(rawArtifactKey, { rows, columns, fileName, sourceEncoding: decodedText.encoding })
 
     requestLog.finish(200, {
       workspace_id: auth.workspaceId,
       user_id: auth.userId,
-      row_count: cappedRows.length,
+      row_count: rows.length,
     })
     return NextResponse.json({
-      rows: cappedRows,
       columns,
-      rowCount: cappedRows.length,
+      rowCount: rows.length,
       sample,
       fileName,
       parseFingerprint,
@@ -370,14 +394,13 @@ export async function POST(req: NextRequest) {
       processedMetrics,
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to parse file'
     captureBackendError({
       error: err,
       requestId: requestLog.requestId,
       context: { route: '/api/parse-file' },
     })
     requestLog.finish(500)
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   } finally {
     if (tempFilePath) {
       await fsp.unlink(tempFilePath).catch(() => {})

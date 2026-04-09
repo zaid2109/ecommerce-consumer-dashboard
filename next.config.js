@@ -36,9 +36,10 @@ const nextConfig = {
 
   // Security headers
   async headers() {
+    const isProduction = process.env.NODE_ENV === 'production'
     const allowUnsafeInline =
       process.env.CSP_ALLOW_UNSAFE_INLINE === 'true' ||
-      process.env.NODE_ENV !== 'production'
+      (!isProduction && process.env.CSP_ALLOW_UNSAFE_INLINE !== 'false')
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
@@ -48,6 +49,7 @@ const nextConfig = {
       "font-src 'self' data:",
       allowUnsafeInline ? "style-src 'self' 'unsafe-inline'" : "style-src 'self'",
       allowUnsafeInline ? "script-src 'self' 'unsafe-inline'" : "script-src 'self'",
+      "script-src-attr 'none'",
       "connect-src 'self' https:",
       "form-action 'self'",
       "upgrade-insecure-requests",

@@ -8,6 +8,13 @@ import { POST as logoutPost } from '@/app/api/auth/logout/route'
 import { GET as connectorsGet, POST as connectorsPost } from '@/app/api/connectors/route'
 import { GET as syncJobsGet } from '@/app/api/connectors/sync-jobs/route'
 import { POST as connectorSyncPost } from '@/app/api/connectors/[id]/sync/route'
+import { GET as membersGet } from '@/app/api/workspace/members/route'
+import { GET as usageGet } from '@/app/api/workspace/usage/route'
+import { GET as invitationsGet } from '@/app/api/workspace/invitations/route'
+import { GET as datasetsGet } from '@/app/api/datasets/route'
+import { GET as billingSubsGet } from '@/app/api/billing/subscriptions/route'
+import { GET as ssoConfigsGet } from '@/app/api/enterprise/sso/route'
+import { GET as dpaGet } from '@/app/api/compliance/dpa/route'
 
 function makeRequest(url: string, init?: ConstructorParameters<typeof NextRequest>[1]): NextRequest {
   return new NextRequest(url, init)
@@ -18,10 +25,6 @@ async function main() {
   if (!databaseUrl) {
     throw new Error('DATABASE_URL is required for integration checks')
   }
-
-  process.env.JWT_SECRET = process.env.JWT_SECRET ?? 'integration-check-secret'
-  process.env.CONNECTOR_ENCRYPTION_KEY =
-    process.env.CONNECTOR_ENCRYPTION_KEY ?? Buffer.alloc(32, 7).toString('base64')
 
   const suffix = Date.now().toString()
   const emailA = `integration-a-${suffix}@example.com`
@@ -48,6 +51,24 @@ async function main() {
       role: 'OWNER',
     },
   })
+  const adminEmail = `integration-admin-${suffix}@example.com`
+  const analystEmail = `integration-analyst-${suffix}@example.com`
+  const adminUser = await prisma.user.create({
+    data: {
+      workspaceId: workspaceA.id,
+      email: adminEmail,
+      passwordHash,
+      role: 'ADMIN',
+    },
+  })
+  const analystUser = await prisma.user.create({
+    data: {
+      workspaceId: workspaceA.id,
+      email: analystEmail,
+      passwordHash,
+      role: 'ANALYST',
+    },
+  })
 
   try {
     const loginResA = await loginPost(
@@ -58,8 +79,7 @@ async function main() {
       })
     )
     assert.equal(loginResA.status, 200, 'login A failed')
-    const loginDataA = (await loginResA.json()) as { accessToken: string }
-    const accessTokenA = loginDataA.accessToken
+    const accessTokenA = loginResA.cookies.get('access_token')?.value
     const refreshCookieA = loginResA.cookies.get('refresh_token')?.value
     const sessionIdA = loginResA.cookies.get('session_id')?.value
     const csrfTokenA = loginResA.cookies.get('csrf_token')?.value
@@ -76,16 +96,37 @@ async function main() {
       })
     )
     assert.equal(loginResB.status, 200, 'login B failed')
-    const loginDataB = (await loginResB.json()) as { accessToken: string }
-    const accessTokenB = loginDataB.accessToken
+    const accessTokenB = loginResB.cookies.get('access_token')?.value
     assert.ok(accessTokenB, 'missing access token for B')
+
+    const loginResAdmin = await loginPost(
+      makeRequest('http://localhost/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: adminEmail, password }),
+      })
+    )
+    assert.equal(loginResAdmin.status, 200, 'login ADMIN failed')
+    const accessTokenAdmin = loginResAdmin.cookies.get('access_token')?.value
+    assert.ok(accessTokenAdmin, 'missing access token for ADMIN')
+
+    const loginResAnalyst = await loginPost(
+      makeRequest('http://localhost/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: analystEmail, password }),
+      })
+    )
+    assert.equal(loginResAnalyst.status, 200, 'login ANALYST failed')
+    const accessTokenAnalyst = loginResAnalyst.cookies.get('access_token')?.value
+    assert.ok(accessTokenAnalyst, 'missing access token for ANALYST')
 
     const createConnectorA = await connectorsPost(
       makeRequest('http://localhost/api/connectors', {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          authorization: `Bearer ${accessTokenA}`,
+          cookie: `access_token=${accessTokenA}`,
         },
         body: JSON.stringify({
           type: 'SHOPIFY',
@@ -102,7 +143,7 @@ async function main() {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          authorization: `Bearer ${accessTokenB}`,
+          cookie: `access_token=${accessTokenB}`,
         },
         body: JSON.stringify({
           type: 'STRIPE',
@@ -117,7 +158,7 @@ async function main() {
     const listA = await connectorsGet(
       makeRequest('http://localhost/api/connectors', {
         method: 'GET',
-        headers: { authorization: `Bearer ${accessTokenA}` },
+        headers: { cookie: `access_token=${accessTokenA}` },
       })
     )
     assert.equal(listA.status, 200, 'connector list A failed')
@@ -128,7 +169,7 @@ async function main() {
     const crossSync = await connectorSyncPost(
       makeRequest(`http://localhost/api/connectors/${connectorBData.connector.id}/sync`, {
         method: 'POST',
-        headers: { authorization: `Bearer ${accessTokenA}` },
+        headers: { cookie: `access_token=${accessTokenA}` },
       }),
       { params: { id: connectorBData.connector.id } }
     )
@@ -143,8 +184,8 @@ async function main() {
       })
     )
     assert.equal(refreshA.status, 200, 'refresh A failed')
-    const refreshData = (await refreshA.json()) as { accessToken: string }
-    assert.ok(refreshData.accessToken, 'missing refreshed access token')
+    const refreshedAccessTokenA = refreshA.cookies.get('access_token')?.value
+    assert.ok(refreshedAccessTokenA, 'missing refreshed access token cookie')
 
     await prisma.connectorSyncJob.create({
       data: {
@@ -160,7 +201,7 @@ async function main() {
     const jobsA = await syncJobsGet(
       makeRequest('http://localhost/api/connectors/sync-jobs', {
         method: 'GET',
-        headers: { authorization: `Bearer ${accessTokenA}` },
+        headers: { cookie: `access_token=${accessTokenA}` },
       })
     )
     assert.equal(jobsA.status, 200, 'sync-jobs A failed')
@@ -171,13 +212,86 @@ async function main() {
       'tenant isolation failed: A can see B sync job'
     )
 
+    const membersResA = await membersGet(
+      makeRequest('http://localhost/api/workspace/members', {
+        method: 'GET',
+        headers: { cookie: `access_token=${accessTokenA}` },
+      })
+    )
+    assert.equal(membersResA.status, 200, 'members A failed')
+    const membersDataA = (await membersResA.json()) as { members: Array<{ email: string }> }
+    assert.equal(
+      membersDataA.members.some((m) => m.email === emailB),
+      false,
+      'tenant isolation failed: A can see B member'
+    )
+
+    const usageResA = await usageGet(
+      makeRequest('http://localhost/api/workspace/usage', {
+        method: 'GET',
+        headers: { cookie: `access_token=${accessTokenA}` },
+      })
+    )
+    assert.equal(usageResA.status, 200, 'usage A failed')
+
+    const invitesResA = await invitationsGet(
+      makeRequest('http://localhost/api/workspace/invitations', {
+        method: 'GET',
+        headers: { cookie: `access_token=${accessTokenA}` },
+      })
+    )
+    assert.equal(invitesResA.status, 200, 'invitations A failed')
+    const invitesDataA = (await invitesResA.json()) as { invitations: Array<{ email: string }> }
+    assert.equal(invitesDataA.invitations.length, 0, 'tenant isolation failed: unexpected invitations leak')
+
+    const datasetsResA = await datasetsGet(
+      makeRequest('http://localhost/api/datasets', {
+        method: 'GET',
+        headers: { cookie: `access_token=${accessTokenA}` },
+      })
+    )
+    assert.equal(datasetsResA.status, 200, 'datasets A failed')
+    const datasetsDataA = (await datasetsResA.json()) as { datasets: Array<{ id: string }> }
+    assert.equal(Array.isArray(datasetsDataA.datasets), true, 'datasets payload shape invalid')
+
+    const billingAsAdmin = await billingSubsGet(
+      makeRequest('http://localhost/api/billing/subscriptions', {
+        method: 'GET',
+        headers: { cookie: `access_token=${accessTokenAdmin}` },
+      })
+    )
+    assert.equal(billingAsAdmin.status, 401, 'admin should not access billing subscriptions')
+
+    const billingAsOwner = await billingSubsGet(
+      makeRequest('http://localhost/api/billing/subscriptions', {
+        method: 'GET',
+        headers: { cookie: `access_token=${accessTokenA}` },
+      })
+    )
+    assert.equal(billingAsOwner.status, 200, 'owner should access billing subscriptions')
+
+    const ssoAsAdmin = await ssoConfigsGet(
+      makeRequest('http://localhost/api/enterprise/sso', {
+        method: 'GET',
+        headers: { cookie: `access_token=${accessTokenAdmin}` },
+      })
+    )
+    assert.equal(ssoAsAdmin.status, 401, 'admin should not access sso configs')
+
+    const dpaAsAnalyst = await dpaGet(
+      makeRequest('http://localhost/api/compliance/dpa', {
+        method: 'GET',
+        headers: { cookie: `access_token=${accessTokenAnalyst}` },
+      })
+    )
+    assert.equal(dpaAsAnalyst.status, 401, 'analyst should not access compliance dpa')
+
     const logoutA = await logoutPost(
       makeRequest('http://localhost/api/auth/logout', {
         method: 'POST',
         headers: {
-          authorization: `Bearer ${accessTokenA}`,
+          cookie: `access_token=${accessTokenA}; refresh_token=${refreshCookieA}; session_id=${sessionIdA}; csrf_token=${csrfTokenA}`,
           'x-csrf-token': csrfTokenA,
-          cookie: `refresh_token=${refreshCookieA}; session_id=${sessionIdA}; csrf_token=${csrfTokenA}`,
         },
       })
     )
@@ -200,7 +314,7 @@ async function main() {
       where: { userId: { in: [userA.id, userB.id] } },
     })
     await prisma.user.deleteMany({
-      where: { id: { in: [userA.id, userB.id] } },
+      where: { id: { in: [userA.id, userB.id, adminUser.id, analystUser.id] } },
     })
     await prisma.workspace.deleteMany({
       where: { id: { in: [workspaceA.id, workspaceB.id] } },

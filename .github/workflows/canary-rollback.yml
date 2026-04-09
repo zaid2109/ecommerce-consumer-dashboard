@@ -1,0 +1,64 @@
+name: Canary and Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Deployment action"
+        required: true
+        default: canary
+        type: choice
+        options:
+          - canary
+          - rollback
+      canary_sha:
+        description: "Commit SHA to deploy as canary (required for canary)"
+        required: false
+      rollback_to_sha:
+        description: "Previously known good SHA to rollback to (required for rollback)"
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate inputs
+        run: |
+          if [ "${{ inputs.action }}" = "canary" ] && [ -z "${{ inputs.canary_sha }}" ]; then
+            echo "canary_sha is required for canary action"
+            exit 1
+          fi
+          if [ "${{ inputs.action }}" = "rollback" ] && [ -z "${{ inputs.rollback_to_sha }}" ]; then
+            echo "rollback_to_sha is required for rollback action"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare release metadata
+        run: |
+          if [ "${{ inputs.action }}" = "canary" ]; then
+            echo "TARGET_SHA=${{ inputs.canary_sha }}" >> $GITHUB_ENV
+            echo "MODE=canary" >> $GITHUB_ENV
+          else
+            echo "TARGET_SHA=${{ inputs.rollback_to_sha }}" >> $GITHUB_ENV
+            echo "MODE=rollback" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy hook
+        env:
+          DEPLOY_WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_WEBHOOK_URL" ]; then
+            echo "DEPLOY_WEBHOOK_URL secret is required"
+            exit 1
+          fi
+          curl --fail --show-error --silent \
+            -X POST "$DEPLOY_WEBHOOK_URL" \
+            -H "content-type: application/json" \
+            -d "{\"mode\":\"$MODE\",\"sha\":\"$TARGET_SHA\",\"repository\":\"${{ github.repository }}\"}"
+
+      - name: Post summary
+        run: |
+          echo "Triggered $MODE for $TARGET_SHA" >> $GITHUB_STEP_SUMMARY

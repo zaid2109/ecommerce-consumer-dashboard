@@ -3,6 +3,7 @@ import IORedis from 'ioredis'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/server/prisma'
 import { runConnectorSync } from '@/lib/server/connectors'
+import { ingestConnectorToDataset } from '@/lib/server/connector-ingestion'
 import { decryptConnectorConfig } from '@/lib/server/connector-secrets'
 import { logError, logJobEvent } from '@/lib/server/logger'
 
@@ -43,7 +44,15 @@ const worker = new Worker(
       throw new Error('Connector not found')
     }
 
-    const result = await runConnectorSync(connector.type, decryptConnectorConfig(connector.config))
+    const decryptedConfig = decryptConnectorConfig(connector.config)
+    const result = await runConnectorSync(connector.type, decryptedConfig)
+    const ingestion = await ingestConnectorToDataset({
+      connectorId: connector.id,
+      workspaceId,
+      connectorType: connector.type,
+      config: decryptedConfig,
+      createdByUserId: null,
+    })
     await prisma.connector.update({
       where: { id: connector.id },
       data: {
@@ -59,7 +68,10 @@ const worker = new Worker(
         action: 'connector.sync.worker',
         resourceType: 'connector',
         resourceId: connector.id,
-        metadata: result.metadata as Prisma.InputJsonValue,
+        metadata: {
+          ...result.metadata,
+          ingestion,
+        } as Prisma.InputJsonValue,
       },
     })
     if (syncJobId) {
@@ -68,7 +80,10 @@ const worker = new Worker(
         data: {
           status: 'COMPLETED',
           completedAt: new Date(),
-          metadata: result.metadata as Prisma.InputJsonValue,
+          metadata: {
+            ...result.metadata,
+            ingestion,
+          } as Prisma.InputJsonValue,
         },
       })
     }

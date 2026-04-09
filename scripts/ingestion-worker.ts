@@ -7,6 +7,9 @@ import { transformDataset } from '@/lib/dataset-transformer'
 import { normalizeColumnMapping } from '@/lib/column-mapper'
 import type { ColumnMapping } from '@/lib/dataset-store'
 import type { Prisma } from '@prisma/client'
+import { evaluateDatasetQuality } from '@/lib/server/data-quality'
+import { evaluateAlertRules } from '@/lib/server/alerts'
+import { runExportJob } from '@/lib/server/exports'
 
 const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379'
 const connection = new IORedis(redisUrl, {
@@ -17,6 +20,17 @@ const connection = new IORedis(redisUrl, {
 const worker = new Worker(
   'ingestion-jobs',
   async (job) => {
+    if (job.name === 'export-dataset') {
+      const data = job.data as {
+        exportJobId: string
+        workspaceId: string
+        datasetId: string | null
+        format: 'CSV' | 'XLSX' | 'PDF'
+      }
+      await runExportJob(data.exportJobId, data.workspaceId, data.datasetId, data.format)
+      return
+    }
+
     const { datasetId, workspaceId } = job.data as {
       datasetId: string
       workspaceId: string
@@ -96,15 +110,32 @@ const worker = new Worker(
       mapping,
       dateFormat: schema.processedMetrics?.dateFormat ?? null,
     })
+    const quality = evaluateDatasetQuality(rawArtifact.rows, mapping)
+    const transformedFromValid = transformDataset({
+      rows: quality.validRows,
+      mapping,
+      dateFormat: schema.processedMetrics?.dateFormat ?? null,
+    })
 
     await writeJsonArtifact(dataset.s3ProcessedKey, {
-      orders: transformed.orders,
-      aggregated: transformed.aggregated,
+      orders: transformedFromValid.orders,
+      aggregated: transformedFromValid.aggregated,
+      quality: {
+        confidence: quality.confidence,
+        rejectedRows: quality.rejectedRows.length,
+        validRows: quality.validRows.length,
+        mappingFingerprint: quality.mappingFingerprint,
+      },
+      rejectRows: quality.rejectedRows,
     })
 
     const updatedMetrics = {
       ...(schema.processedMetrics ?? {}),
-      transformedRowCount: transformed.orders.length,
+      transformedRowCount: transformedFromValid.orders.length,
+      rejectedRowCount: quality.rejectedRows.length,
+      validRowCount: quality.validRows.length,
+      schemaInferenceConfidence: quality.confidence,
+      mappingFingerprint: quality.mappingFingerprint,
       transformedAt: new Date().toISOString(),
     }
 
@@ -117,7 +148,7 @@ const worker = new Worker(
     await prisma.dataset.updateMany({
       where: { id: datasetId, workspaceId },
       data: {
-        rowCount: transformed.orders.length,
+        rowCount: transformedFromValid.orders.length,
         columnCount: availableColumns.length,
         schema: nextSchema,
       },
@@ -137,6 +168,7 @@ const worker = new Worker(
       where: { id: datasetId, workspaceId },
       data: { status: 'READY' },
     })
+    await evaluateAlertRules(workspaceId, datasetId)
     logJobEvent({
       jobId: String(job.id),
       datasetId,

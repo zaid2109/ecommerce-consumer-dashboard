@@ -154,16 +154,19 @@ export async function POST(req: NextRequest) {
       await prisma.ingestionJob.update({
         where: { id: job.id },
         data: {
-          status: 'COMPLETED',
+          status: 'FAILED',
           startedAt: new Date(),
           completedAt: new Date(),
-          metadata: { progress: 100, mode: 'inline-no-queue' },
+          errorMessage: 'Ingestion queue unavailable',
+          metadata: { progress: 0, mode: 'queue-unavailable' },
         },
       })
       await prisma.dataset.update({
         where: { id: dataset.id },
-        data: { status: 'READY' },
+        data: { status: 'FAILED' },
       })
+      requestLog.finish(503, { workspace_id: auth.workspaceId, user_id: auth.userId })
+      return NextResponse.json({ error: 'Ingestion queue unavailable', dataset, jobId: job.id }, { status: 503 })
     }
   } catch (error) {
     logError('queue.enqueue.error', {
@@ -172,6 +175,20 @@ export async function POST(req: NextRequest) {
       user_id: auth.userId,
       error_message: error instanceof Error ? error.message : String(error),
     })
+    await prisma.ingestionJob.update({
+      where: { id: job.id },
+      data: {
+        status: 'FAILED',
+        completedAt: new Date(),
+        errorMessage: error instanceof Error ? error.message : String(error),
+      },
+    })
+    await prisma.dataset.update({
+      where: { id: dataset.id },
+      data: { status: 'FAILED' },
+    })
+    requestLog.finish(500, { workspace_id: auth.workspaceId, user_id: auth.userId })
+    return NextResponse.json({ error: 'Failed to enqueue ingestion job' }, { status: 500 })
   }
 
   requestLog.finish(201, { workspace_id: auth.workspaceId, user_id: auth.userId })

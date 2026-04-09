@@ -56,6 +56,11 @@ export function useDataset(): {
       .then(async (payload) => {
         const latest = payload?.datasets?.[0]
         if (!mounted || !latest?.id) return
+        if (latest.status !== 'READY') {
+          setBackendAggregated(null)
+          setBackendOrders(null)
+          return
+        }
 
         const processedRes = await fetchWithAuth(`/api/datasets/${latest.id}/data`, { cache: 'no-store' })
         if (!mounted) return

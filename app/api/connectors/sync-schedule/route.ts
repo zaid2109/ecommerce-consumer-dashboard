@@ -4,6 +4,7 @@ import { prisma } from '@/lib/server/prisma'
 import { canAccess, readAuthContext } from '@/lib/server/auth'
 import { getConnectorSyncQueue } from '@/lib/server/connector-queue'
 import { runConnectorSync } from '@/lib/server/connectors'
+import { ingestConnectorToDataset } from '@/lib/server/connector-ingestion'
 import { allowAction } from '@/lib/server/rate-limit'
 import { enforceCsrf } from '@/lib/server/security'
 import { decryptConnectorConfig } from '@/lib/server/connector-secrets'
@@ -71,10 +72,18 @@ export async function POST(req: NextRequest) {
     })
     try {
       const connectorWithConfig = await prisma.connector.findUnique({ where: { id: connector.id } })
+      const decryptedConfig = decryptConnectorConfig(connectorWithConfig?.config ?? null)
       const result = await runConnectorSync(
         connector.type,
-        decryptConnectorConfig(connectorWithConfig?.config ?? null)
+        decryptedConfig
       )
+      const ingestion = await ingestConnectorToDataset({
+        connectorId: connector.id,
+        workspaceId: auth.workspaceId,
+        connectorType: connector.type,
+        config: decryptedConfig,
+        createdByUserId: auth.userId,
+      })
       await prisma.connector.update({
         where: { id: connector.id },
         data: {
@@ -91,7 +100,10 @@ export async function POST(req: NextRequest) {
           action: 'connector.sync.scheduled',
           resourceType: 'connector',
           resourceId: connector.id,
-          metadata: result.metadata as Prisma.InputJsonValue,
+          metadata: {
+            ...result.metadata,
+            ingestion,
+          } as Prisma.InputJsonValue,
         },
       })
       await prisma.connectorSyncJob.update({
@@ -99,7 +111,10 @@ export async function POST(req: NextRequest) {
         data: {
           status: 'COMPLETED',
           completedAt: new Date(),
-          metadata: result.metadata as Prisma.InputJsonValue,
+          metadata: {
+            ...result.metadata,
+            ingestion,
+          } as Prisma.InputJsonValue,
         },
       })
     } catch (error) {

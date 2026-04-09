@@ -3,9 +3,11 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/server/prisma'
 import { canAccess, readAuthContext } from '@/lib/server/auth'
 import { runConnectorSync } from '@/lib/server/connectors'
+import { ingestConnectorToDataset } from '@/lib/server/connector-ingestion'
 import { allowAction } from '@/lib/server/rate-limit'
 import { enforceCsrf } from '@/lib/server/security'
 import { decryptConnectorConfig } from '@/lib/server/connector-secrets'
+import { logError } from '@/lib/server/logger'
 
 export const runtime = 'nodejs'
 
@@ -51,7 +53,15 @@ export async function POST(
   })
 
   try {
-    const result = await runConnectorSync(connector.type, decryptConnectorConfig(connector.config))
+    const decryptedConfig = decryptConnectorConfig(connector.config)
+    const result = await runConnectorSync(connector.type, decryptedConfig)
+    const ingestion = await ingestConnectorToDataset({
+      connectorId: connector.id,
+      workspaceId: auth.workspaceId,
+      connectorType: connector.type,
+      config: decryptedConfig,
+      createdByUserId: auth.userId,
+    })
     const updated = await prisma.connector.update({
       where: { id: connector.id },
       data: {
@@ -61,7 +71,10 @@ export async function POST(
         lastError: null,
       },
     })
-    const metadata = result.metadata as Prisma.InputJsonValue
+    const metadata = {
+      ...result.metadata,
+      ingestion,
+    } as Prisma.InputJsonValue
 
     await prisma.auditLog.create({
       data: {
@@ -85,6 +98,12 @@ export async function POST(
     return NextResponse.json({ connector: updated, result })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sync failed'
+    logError('connector.sync.error', {
+      workspace_id: auth.workspaceId,
+      user_id: auth.userId,
+      connector_id: connector.id,
+      error_message: message,
+    })
     await prisma.connector.update({
       where: { id: connector.id },
       data: { status: 'ERROR', lastError: message },
@@ -97,6 +116,6 @@ export async function POST(
         errorMessage: message,
       },
     })
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

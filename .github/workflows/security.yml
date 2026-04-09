@@ -1,0 +1,58 @@
+name: Security
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  dependency-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit dependencies (high/critical)
+        run: npm audit --audit-level=high
+
+  container-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Dockerfile
+        id: dockerfile
+        run: |
+          if [ -f Dockerfile ] || [ -f dockerfile ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build container image
+        if: steps.dockerfile.outputs.exists == 'true'
+        run: docker build -t ecodash:security-scan .
+
+      - name: Scan container image (fail on high/critical)
+        if: steps.dockerfile.outputs.exists == 'true'
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ecodash:security-scan
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
+      - name: Skip container scan when no Dockerfile
+        if: steps.dockerfile.outputs.exists != 'true'
+        run: echo "No Dockerfile detected; container scan skipped."

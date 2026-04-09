@@ -35,8 +35,15 @@ export async function POST(req: NextRequest) {
   }
 
   const response = NextResponse.json({
-    accessToken: rotated.accessToken,
     auth: rotated.auth,
+  })
+
+  response.cookies.set('access_token', rotated.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+    expires: rotated.expiresAt,
   })
 
   response.cookies.set('refresh_token', rotated.refreshToken, {

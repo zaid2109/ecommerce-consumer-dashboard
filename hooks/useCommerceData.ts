@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useFilteredOrders } from '@/hooks/useChartData'
 import type { Order } from '@/lib/types'
+import { KPI_FORMULAS } from '@/lib/kpi-formulas'
 
 type CategoryAgg = {
   category: Order['category']
@@ -100,7 +101,7 @@ export function useProductsData() {
         grossRevenue: row.gross,
         returnsValue: row.returns,
         netRevenue: net,
-        returnRate: row.orders ? row.returns / row.gross : 0,
+        returnRate: KPI_FORMULAS.categoryReturnRateRatio(row.orders, row.returns),
         avgRating,
         avgPrice,
         momGrowth,
@@ -110,7 +111,7 @@ export function useProductsData() {
     const totalOrders = filteredOrders.length || 1
     const uniqueSkuEstimate = Math.round(new Set(filteredOrders.map((o) => o.productName)).size * 1.15)
     const totalRevenue = filteredOrders.reduce((s, o) => s + o.revenue, 0)
-    const avgOrderValue = totalRevenue / totalOrders
+    const avgOrderValue = KPI_FORMULAS.safeAverage(totalRevenue, totalOrders)
 
     const boxPlot = CATEGORIES.map((category) => {
       const prices = [...(byCategory.get(category)?.prices ?? [])].sort((a, b) => a - b)
@@ -189,8 +190,14 @@ export function usePaymentsData() {
     })
 
     const totalCount = filteredOrders.length || 1
-    const successRate = (filteredOrders.filter((o) => o.paymentStatus === 'Completed').length / totalCount) * 100
-    const avgTransactionValue = filteredOrders.reduce((s, o) => s + o.revenue, 0) / totalCount
+    const successRate = KPI_FORMULAS.returnRatePercent(
+      totalCount,
+      filteredOrders.filter((o) => o.paymentStatus === 'Completed').length
+    )
+    const avgTransactionValue = KPI_FORMULAS.safeAverage(
+      filteredOrders.reduce((s, o) => s + o.revenue, 0),
+      totalCount
+    )
     const failedPayments = filteredOrders.filter((o) => o.paymentStatus === 'Failed').reduce((s, o) => s + o.revenue, 0)
     const topMethod = [...methodRows].sort((a, b) => b.count - a.count)[0]?.method ?? 'N/A'
 
@@ -237,7 +244,7 @@ export function useReturnsData() {
     const returned = filteredOrders.filter((o) => o.isReturned)
     const totalReturns = returned.length
     const refundValue = returned.reduce((s, o) => s + o.revenue, 0)
-    const returnRate = filteredOrders.length ? (totalReturns / filteredOrders.length) * 100 : 0
+    const returnRate = KPI_FORMULAS.returnRatePercent(filteredOrders.length, totalReturns)
     const avgDaysToReturn =
       returned.length
         ? returned.reduce((s, o) => s + Math.max(0, Math.round(((o.returnDate?.getTime() ?? o.orderDate.getTime()) - o.orderDate.getTime()) / 86400000)), 0) / returned.length
@@ -295,7 +302,12 @@ export function useReturnsData() {
 
     const categoryRateData = CATEGORIES.map((category) => {
       const c = byCategory.get(category)!
-      return { category, rate: c.orders ? (c.returns / c.orders) * 100 : 0, refunds: c.refunds, orders: c.orders }
+        return {
+          category,
+          rate: KPI_FORMULAS.returnRatePercent(c.orders, c.returns),
+          refunds: c.refunds,
+          orders: c.orders,
+        }
     }).sort((a, b) => b.rate - a.rate)
 
     const returnBySegment = SEGMENTS.map((segment) => {

@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import type { Order } from '@/lib/types'
 import { useFilterStore } from '@/lib/store'
 import { useDataset } from './useDataset'
+import { KPI_FORMULAS } from '@/lib/kpi-formulas'
 
 type CustomerRow = {
   customerId: string
@@ -248,10 +249,7 @@ export function useCustomersPageData() {
       color: segmentColor[seg],
     }))
 
-    const sampleScatter = customers
-      .filter(() => Math.random() < 0.02)
-      .slice(0, 2000)
-      .map((c) => ({
+    const sampleScatter = KPI_FORMULAS.deterministicScatterSample(customers, 2000).map((c) => ({
         name: c.name,
         segment: c.segment,
         frequency: c.totalOrders,

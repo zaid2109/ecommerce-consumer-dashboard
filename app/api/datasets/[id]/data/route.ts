@@ -8,6 +8,13 @@ export const runtime = 'nodejs'
 type StoredDatasetPayload = {
   orders: unknown[]
   aggregated: unknown
+  quality?: {
+    confidence?: number
+    rejectedRows?: number
+    validRows?: number
+    mappingFingerprint?: string
+  }
+  rejectRows?: Array<Record<string, unknown> & { __reject_reason: string }>
 }
 
 export async function GET(
@@ -40,6 +47,7 @@ export async function GET(
     status: dataset.status,
     orders: artifact.orders,
     aggregated: artifact.aggregated,
+    quality: artifact.quality ?? null,
   })
 }
 

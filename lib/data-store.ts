@@ -8,11 +8,17 @@ let fetchPromise: Promise<PreAggregated> | null = null
 let cachedOrders: Order[] | null = null
 let fetchOrdersPromise: Promise<Order[]> | null = null
 
+function fetchWithTimeout(input: RequestInfo | URL, timeoutMs = 8000): Promise<Response> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), timeoutMs)
+  return fetch(input, { signal: controller.signal }).finally(() => clearTimeout(timeout))
+}
+
 export function getAggregatedData(): Promise<PreAggregated> {
   if (cachedAggregated) return Promise.resolve(cachedAggregated)
   if (fetchPromise) return fetchPromise
 
-  fetchPromise = fetch('/data/aggregated.json')
+  fetchPromise = fetchWithTimeout('/data/aggregated.json')
     .then(res => {
       if (!res.ok) throw new Error('Failed to load dashboard data')
       return res.json()
@@ -20,6 +26,10 @@ export function getAggregatedData(): Promise<PreAggregated> {
     .then(data => {
       cachedAggregated = data
       return data
+    })
+    .catch((error) => {
+      fetchPromise = null
+      throw error
     })
 
   return fetchPromise
@@ -48,7 +58,7 @@ export function getOrdersData(): Promise<Order[]> {
   if (cachedOrders) return Promise.resolve(cachedOrders)
   if (fetchOrdersPromise) return fetchOrdersPromise
 
-  fetchOrdersPromise = fetch('/data/orders.json')
+  fetchOrdersPromise = fetchWithTimeout('/data/orders.json')
     .then(res => {
       if (!res.ok) throw new Error('Failed to load order data')
       return res.json()
@@ -60,6 +70,10 @@ export function getOrdersData(): Promise<Order[]> {
         returnDate: row.returnDate ? new Date(row.returnDate) : undefined,
       }))
       return cachedOrders
+    })
+    .catch((error) => {
+      fetchOrdersPromise = null
+      throw error
     })
 
   return fetchOrdersPromise

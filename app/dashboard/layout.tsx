@@ -24,7 +24,17 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { loading } = useAggregatedData()
+  const { loading, error } = useAggregatedData()
 
-  return <DashboardShell>{loading ? <DashboardLayoutSkeleton /> : children}</DashboardShell>
+  return (
+    <DashboardShell>
+      {loading ? <DashboardLayoutSkeleton /> : null}
+      {!loading && error ? (
+        <div className="sc p-4">
+          <p className="text-sm text-red-300">Failed to load dashboard dataset. Please refresh the page.</p>
+        </div>
+      ) : null}
+      {!loading && !error ? children : null}
+    </DashboardShell>
+  )
 }

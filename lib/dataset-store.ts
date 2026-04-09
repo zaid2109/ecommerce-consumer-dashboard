@@ -27,6 +27,9 @@ export interface DatasetMeta {
   columns: string[]
   uploadedAt: string
   datasetType: string
+  datasetId?: string
+  jobId?: string
+  status?: string
   aiInsights: string[]
   suggestedKPIs: { label: string; value: string; delta: string; positive: boolean }[]
 }
@@ -38,7 +41,7 @@ interface DatasetState {
   columnMapping: ColumnMapping | null
   rawRows: Record<string, unknown>[] | null
   isUploading: boolean
-  uploadStep: 'idle' | 'parsing' | 'analyzing' | 'mapping' | 'transforming' | 'ready'
+  uploadStep: 'idle' | 'parsing' | 'analyzing' | 'queueing' | 'processing' | 'mapping' | 'transforming' | 'ready'
   uploadError: string | null
 
   setRawRows: (rows: Record<string, unknown>[]) => void

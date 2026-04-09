@@ -126,6 +126,13 @@ export async function GET(
   })
 
   const response = NextResponse.redirect(new URL('/dashboard', req.nextUrl.origin))
+  response.cookies.set('access_token', session.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+    expires: session.expiresAt,
+  })
   response.cookies.set('refresh_token', session.refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

@@ -61,6 +61,68 @@ enum ConnectorSyncTrigger {
   RETRY
 }
 
+enum SavedViewVisibility {
+  PRIVATE
+  TEAM
+}
+
+enum AlertType {
+  THRESHOLD
+  ANOMALY
+}
+
+enum AlertChannel {
+  EMAIL
+  SLACK
+}
+
+enum AlertEventStatus {
+  OPEN
+  ACKNOWLEDGED
+}
+
+enum ExportFormat {
+  CSV
+  XLSX
+  PDF
+}
+
+enum ExportJobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum GdprRequestType {
+  EXPORT
+  DELETE
+}
+
+enum GdprRequestStatus {
+  REQUESTED
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+enum SSOProviderType {
+  SAML
+  OIDC
+}
+
+enum DrillStatus {
+  PASSED
+  FAILED
+}
+
 model Workspace {
   id         String      @id @default(cuid())
   name       String
@@ -74,6 +136,23 @@ model Workspace {
   invitations Invitation[]
   connectors  Connector[]
   connectorSyncJobs ConnectorSyncJob[]
+  savedViews  SavedView[]
+  alertRules  AlertRule[]
+  alertEvents AlertEvent[]
+  exportJobs  ExportJob[]
+  subscriptions Subscription[]
+  billingEvents BillingEvent[]
+  usageMeters UsageMeter[]
+  gdprRequests GdprRequest[]
+  dpaAgreements DpaAgreement[]
+  retentionPolicies RetentionPolicy[]
+  subprocessors Subprocessor[]
+  ssoConfigs SsoConfig[]
+  backupDrills BackupDrill[]
+  runbooks Runbook[]
+  sloTargets SloTarget[]
+  incidents IncidentPlaybook[]
+  demoFixtures DemoFixture[]
 }
 
 model User {
@@ -91,6 +170,14 @@ model User {
   sessions       Session[]
   auditLogs      AuditLog[]
   datasets       Dataset[]   @relation("DatasetCreatedBy")
+  savedViews     SavedView[] @relation("SavedViewCreatedBy")
+  createdAlertRules AlertRule[] @relation("AlertRuleCreatedBy")
+  acknowledgedAlertEvents AlertEvent[] @relation("AlertEventAcknowledgedBy")
+  exportJobs     ExportJob[] @relation("ExportJobCreatedBy")
+  gdprRequests   GdprRequest[]
+  dpaAgreements  DpaAgreement[]
+  backupDrills   BackupDrill[]
+  incidents      IncidentPlaybook[]
 }
 
 model Session {
@@ -144,6 +231,7 @@ model Dataset {
   workspace      Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   createdBy      User           @relation("DatasetCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
   jobs           IngestionJob[]
+  exportJobs     ExportJob[]
 }
 
 model IngestionJob {
@@ -221,4 +309,260 @@ model OAuthState {
   expiresAt    DateTime
   usedAt       DateTime?
   createdAt    DateTime  @default(now())
+}
+
+model SavedView {
+  id          String              @id @default(cuid())
+  workspaceId String
+  createdById String
+  name        String
+  pagePath    String
+  visibility  SavedViewVisibility @default(PRIVATE)
+  isPinned    Boolean             @default(false)
+  shareToken  String              @unique
+  filters     Json
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  workspace   Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User                @relation("SavedViewCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, pagePath, createdAt])
+}
+
+model AlertRule {
+  id            String       @id @default(cuid())
+  workspaceId   String
+  createdById   String
+  name          String
+  metric        String
+  type          AlertType
+  comparator    String
+  threshold     Float?
+  channels      AlertChannel[]
+  slackWebhook  String?
+  emailTargets  String[]
+  enabled       Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  workspace     Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy     User         @relation("AlertRuleCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  events        AlertEvent[]
+
+  @@index([workspaceId, enabled, createdAt])
+}
+
+model AlertEvent {
+  id               String           @id @default(cuid())
+  workspaceId      String
+  ruleId           String
+  status           AlertEventStatus @default(OPEN)
+  title            String
+  message          String
+  metricValue      Float?
+  breachedAt       DateTime         @default(now())
+  acknowledgedAt   DateTime?
+  acknowledgedById String?
+  metadata         Json?
+  workspace        Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  rule             AlertRule        @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  acknowledgedBy   User?            @relation("AlertEventAcknowledgedBy", fields: [acknowledgedById], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, status, breachedAt])
+}
+
+model ExportJob {
+  id             String          @id @default(cuid())
+  workspaceId    String
+  createdById    String
+  datasetId      String?
+  format         ExportFormat
+  status         ExportJobStatus @default(QUEUED)
+  scheduleCron   String?
+  artifactKey    String?
+  errorMessage   String?
+  payload        Json?
+  auditMetadata  Json?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy      User            @relation("ExportJobCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  dataset        Dataset?        @relation(fields: [datasetId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, createdAt])
+  @@index([workspaceId, status, createdAt])
+}
+
+model Subscription {
+  id                String             @id @default(cuid())
+  workspaceId       String
+  provider          String             @default("stripe")
+  externalId        String?
+  plan              WorkspacePlan
+  status            SubscriptionStatus @default(TRIALING)
+  trialEndsAt       DateTime?
+  currentPeriodEnd  DateTime?
+  overageRows       Int                @default(0)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  workspace         Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, status, createdAt])
+}
+
+model BillingEvent {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  provider     String    @default("stripe")
+  eventType    String
+  providerEventId String?
+  payload      Json
+  createdAt    DateTime  @default(now())
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerEventId])
+  @@index([workspaceId, createdAt])
+}
+
+model UsageMeter {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  metric         String
+  quantity       Int       @default(0)
+  windowStart    DateTime
+  windowEnd      DateTime
+  createdAt      DateTime  @default(now())
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, metric, windowStart])
+}
+
+model GdprRequest {
+  id             String            @id @default(cuid())
+  workspaceId    String
+  requestedById  String
+  requestType    GdprRequestType
+  subjectEmail   String
+  status         GdprRequestStatus @default(REQUESTED)
+  artifactKey    String?
+  rejectionReason String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  completedAt    DateTime?
+  workspace      Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  requestedBy    User              @relation(fields: [requestedById], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, status, createdAt])
+}
+
+model DpaAgreement {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  acceptedById   String
+  version        String
+  acceptedAt     DateTime  @default(now())
+  metadata       Json?
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  acceptedBy     User      @relation(fields: [acceptedById], references: [id], onDelete: Cascade)
+}
+
+model RetentionPolicy {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  resourceType   String
+  retentionDays  Int
+  enabled        Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, resourceType])
+}
+
+model Subprocessor {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  name           String
+  purpose        String
+  region         String?
+  website        String?
+  active         Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, active, createdAt])
+}
+
+model SsoConfig {
+  id             String          @id @default(cuid())
+  workspaceId    String
+  providerType   SSOProviderType
+  issuer         String?
+  entryPoint     String?
+  clientId       String?
+  clientSecret   String?
+  metadataUrl    String?
+  enabled        Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, providerType, enabled])
+}
+
+model BackupDrill {
+  id             String      @id @default(cuid())
+  workspaceId    String
+  triggeredById  String
+  status         DrillStatus
+  notes          String?
+  startedAt      DateTime    @default(now())
+  completedAt    DateTime?
+  workspace      Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  triggeredBy    User        @relation(fields: [triggeredById], references: [id], onDelete: Cascade)
+}
+
+model Runbook {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  name           String
+  content        String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model SloTarget {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  name           String
+  objective      Float
+  measurement    String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model IncidentPlaybook {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  ownerId        String
+  title          String
+  severity       String
+  content        String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  owner          User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+model DemoFixture {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  name           String
+  description    String?
+  datasetId      String?
+  createdAt      DateTime  @default(now())
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }

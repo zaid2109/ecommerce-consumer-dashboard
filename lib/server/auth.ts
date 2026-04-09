@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 import { prisma } from './prisma'
+import { requireEnv } from './env'
 
 export type AuthContext = {
   userId: string
@@ -10,23 +11,15 @@ export type AuthContext = {
   role: 'OWNER' | 'ADMIN' | 'ANALYST' | 'VIEWER'
 }
 
-const SECRET = process.env.JWT_SECRET || 'development-insecure-secret'
+const SECRET = requireEnv('JWT_SECRET')
 const ACCESS_TTL_SECONDS = 15 * 60
 const REFRESH_TTL_SECONDS = 7 * 24 * 60 * 60
 
-export function readAuthContext(req: NextRequest): AuthContext | null {
-  const header = req.headers.get('authorization')
-  if (!header?.startsWith('Bearer ')) {
-    if (process.env.LOCAL_TEST_MODE === 'true' && process.env.NODE_ENV !== 'production') {
-      return {
-        userId: process.env.LOCAL_TEST_USER_ID ?? 'local-test-user',
-        workspaceId: process.env.LOCAL_TEST_WORKSPACE_ID ?? 'local-test-workspace',
-        role: 'OWNER',
-      }
-    }
-    return null
-  }
-  const token = header.slice('Bearer '.length)
+function signAccessToken(payload: AuthContext): string {
+  return jwt.sign(payload, SECRET, { expiresIn: ACCESS_TTL_SECONDS })
+}
+
+function verifyAccessToken(token: string): AuthContext | null {
   try {
     const decoded = jwt.verify(token, SECRET) as Partial<AuthContext>
     if (!decoded.userId || !decoded.workspaceId || !decoded.role) return null
@@ -40,19 +33,38 @@ export function readAuthContext(req: NextRequest): AuthContext | null {
   }
 }
 
+export function readAuthContext(req: NextRequest): AuthContext | null {
+  const cookieToken = req.cookies.get('access_token')?.value
+  if (cookieToken) {
+    return verifyAccessToken(cookieToken)
+  }
+
+  const header = req.headers.get('authorization')
+  if (!header?.startsWith('Bearer ')) return null
+  const bearerToken = header.slice('Bearer '.length)
+  return verifyAccessToken(bearerToken)
+}
+
 export function canAccess(
   role: AuthContext['role'],
-  action: 'dataset:read' | 'dataset:write' | 'member:manage' | 'invite:manage'
+  action:
+    | 'dataset:read'
+    | 'dataset:write'
+    | 'member:manage'
+    | 'invite:manage'
+    | 'admin:billing'
+    | 'admin:compliance'
+    | 'admin:sso'
+    | 'admin:ops'
+    | 'admin:sales'
 ): boolean {
   if (role === 'OWNER') return true
-  if (role === 'ADMIN') return true
+  if (role === 'ADMIN') {
+    return action !== 'admin:billing' && action !== 'admin:compliance' && action !== 'admin:sso'
+  }
   if (role === 'ANALYST') return action === 'dataset:read' || action === 'dataset:write'
   if (role === 'VIEWER') return action === 'dataset:read'
   return false
-}
-
-function signAccessToken(payload: AuthContext): string {
-  return jwt.sign(payload, SECRET, { expiresIn: ACCESS_TTL_SECONDS })
 }
 
 function newRefreshToken(): string {

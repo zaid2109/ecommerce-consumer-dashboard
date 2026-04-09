@@ -47,7 +47,7 @@ export function DatasetBanner() {
         <span style={{ fontSize: 12, color: '#6b7280', marginLeft: 8 }}>
           {meta
             ? `${meta.fileName} · ${meta.rowCount.toLocaleString()} rows · uploaded ${new Date(meta.uploadedAt).toLocaleDateString()}`
-            : `${latestDataset?.name ?? 'Dataset'} · ${(latestDataset?.rowCount ?? 0).toLocaleString()} rows · status ${latestDataset?.status?.toLowerCase() ?? 'unknown'}`}
+            : `${latestDataset?.name ?? 'Dataset'} · ${(latestDataset?.rowCount ?? 0).toLocaleString()} rows · status ${(latestDataset?.status ?? 'unknown').toLowerCase()}`}
         </span>
       </div>
       <button
