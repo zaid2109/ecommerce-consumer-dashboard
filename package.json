@@ -40,7 +40,7 @@
     "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.383.0",
-    "next": "^14.2.35",
+    "next": "^16.2.6",
     "next-themes": "^0.3.0",
     "prisma": "^5.22.0",
     "react": "^18.3.1",
@@ -62,11 +62,14 @@
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
     "@vitest/coverage-v8": "^2.1.8",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^14.2.35",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.2.6",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^2.1.8"
+  },
+  "overrides": {
+    "d3-color": "^3.1.0"
   }
 }

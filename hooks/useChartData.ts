@@ -139,7 +139,7 @@ export function useKPIData(): KPIData {
         returnRate: safeDelta(current.returnRate, previous.returnRate),
       },
     }
-  }, [filterState, aggregated, orders])
+  }, [filterState, orders])
 }
 
 export function useFilteredOrders(): Order[] {

@@ -1,8 +1,21 @@
 'use client'
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export const SpireTooltip = (props: any) => {
-  const { active, payload, label, formatter } = props
+type TooltipPayloadEntry = {
+  name?: string
+  value?: number
+  dataKey?: string
+  color?: string
+  stroke?: string
+}
+
+type SpireTooltipProps = {
+  active?: boolean
+  payload?: TooltipPayloadEntry[]
+  label?: string
+  formatter?: (value: number, dataKey: string | undefined) => string
+}
+
+export const SpireTooltip = ({ active, payload, label, formatter }: SpireTooltipProps) => {
   if (!active || !payload?.length) return null
 
   return (
@@ -24,7 +37,7 @@ export const SpireTooltip = (props: any) => {
         </p>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-        {(payload as any[]).map((p: any, i: number) => (
+        {payload.map((p, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94a3b8' }}>
               <span style={{
@@ -36,7 +49,7 @@ export const SpireTooltip = (props: any) => {
               {p.name}
             </span>
             <span style={{ fontWeight: 700, color: '#f8fafc', fontVariantNumeric: 'tabular-nums' }}>
-              {formatter ? formatter(p.value, p.dataKey) : (p.value as number)?.toLocaleString()}
+              {formatter ? formatter(p.value ?? 0, p.dataKey) : p.value?.toLocaleString()}
             </span>
           </div>
         ))}

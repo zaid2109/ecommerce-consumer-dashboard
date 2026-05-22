@@ -29,9 +29,11 @@ export function TableSkeleton() {
   )
 }
 
-export default {
+const Skeletons = {
   KPICardSkeleton,
   ChartSkeleton,
   TableSkeleton,
 }
+
+export default Skeletons
 

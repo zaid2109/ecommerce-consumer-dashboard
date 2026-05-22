@@ -7,7 +7,7 @@ import * as Popover from '@radix-ui/react-popover'
 import { Columns3 } from 'lucide-react'
 import useDebounce from '@/hooks/useDebounce'
 
-type VirtualTableProps<TData extends Record<string, any>> = {
+type VirtualTableProps<TData extends Record<string, unknown>> = {
   columns: ColumnDef<TData>[]
   data: TData[]
   rowHeight?: number
@@ -16,7 +16,7 @@ type VirtualTableProps<TData extends Record<string, any>> = {
   onExportCSV?: () => void
 }
 
-export function VirtualTable<TData extends Record<string, any>>({
+export function VirtualTable<TData extends Record<string, unknown>>({
   columns,
   data,
   rowHeight = 48,
