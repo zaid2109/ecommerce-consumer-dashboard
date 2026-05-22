@@ -74,8 +74,8 @@ async function parseMultipart(req: NextRequest): Promise<{ fileName: string; mim
   if (!webStream) {
     throw new Error('Missing request body')
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const nodeStream = (await import('stream')).Readable.fromWeb(webStream as any)
+  const { Readable: NodeReadable } = await import('stream')
+  const nodeStream = NodeReadable.from(webStream as unknown as AsyncIterable<Uint8Array>)
 
   await new Promise<void>((resolve, reject) => {
     let writeFinished = false
