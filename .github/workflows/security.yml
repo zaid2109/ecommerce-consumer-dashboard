@@ -45,7 +45,7 @@ jobs:
 
       - name: Scan container image (fail on high/critical)
         if: steps.dockerfile.outputs.exists == 'true'
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
           image-ref: ecodash:security-scan
           format: table

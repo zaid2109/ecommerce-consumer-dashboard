@@ -49,17 +49,17 @@ jobs:
       - name: Prisma db push
         run: npx prisma db push --accept-data-loss
 
-      - name: Type check
-        run: npm run type-check
-
       - name: Lint
         run: npm run lint
 
-      - name: Integration checks
-        run: npm run check:integration
-
       - name: Build
         run: npm run build
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Integration checks
+        run: npm run check:integration
 
       - name: Unit tests with coverage
         run: npm run test:unit:coverage
