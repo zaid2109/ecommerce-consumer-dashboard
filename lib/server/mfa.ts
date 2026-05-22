@@ -50,12 +50,37 @@ export function getTotpUri(input: { secret: string; email: string; issuer: strin
   return `otpauth://totp/${label}?secret=${input.secret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`
 }
 
+// Maps secret → Set of "code:counter" strings that have already been used.
+// Prevents a valid TOTP code from being accepted twice within its window.
+// Per-process only; add Redis persistence for distributed deployments.
+const usedTotpCodes = new Map<string, Set<string>>()
+
+function pruneUsedCodes(secret: string, nowCounter: number, window: number) {
+  const used = usedTotpCodes.get(secret)
+  if (!used) return
+  for (const entry of used) {
+    const counter = Number(entry.split(':')[1])
+    if (Math.abs(counter - nowCounter) > window + 1) used.delete(entry)
+  }
+  if (used.size === 0) usedTotpCodes.delete(secret)
+}
+
 export function verifyTotpCode(input: { secret: string; code: string; window?: number }): boolean {
   const nowCounter = Math.floor(Date.now() / 30_000)
   const window = input.window ?? 1
   const normalized = input.code.trim()
+
+  pruneUsedCodes(input.secret, nowCounter, window)
+
+  const used = usedTotpCodes.get(input.secret) ?? new Set<string>()
+
   for (let i = -window; i <= window; i += 1) {
-    if (hotp(input.secret, nowCounter + i) === normalized) {
+    const counter = nowCounter + i
+    const entry = `${normalized}:${counter}`
+    if (used.has(entry)) continue
+    if (hotp(input.secret, counter) === normalized) {
+      used.add(entry)
+      usedTotpCodes.set(input.secret, used)
       return true
     }
   }

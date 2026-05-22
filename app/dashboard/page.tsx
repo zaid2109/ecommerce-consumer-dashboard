@@ -58,7 +58,7 @@ export default function DashboardPage() {
       <FilterBar />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <KPICard title="Sales" value={formatCurrency(kpi.totalRevenue)} delta={12.5} deltaLabel="Last 3 weeks" variant="ring" ringPercent={37} sparklineData={sparkline30d} SparklineComponent={SparklineChart} />
+        <KPICard title="Sales" value={formatCurrency(kpi.totalRevenue)} delta={kpi.deltas.revenue} deltaLabel="Last 3 weeks" variant="ring" ringPercent={37} sparklineData={sparkline30d} SparklineComponent={SparklineChart} />
         <KPICard title="Orders" value={formatNumber(kpi.totalOrders)} delta={Math.max(0.1, kpi.deltas.orders)} deltaLabel="Last 3 weeks" variant="ring" ringPercent={orderRing} sparklineData={sparkline30d} SparklineComponent={SparklineChart} />
         <KPICard title="Customers" value={formatNumber(kpi.activeCustomers)} delta={-Math.max(0.1, Math.abs(kpi.deltas.customers))} deltaLabel="Last 3 weeks" variant="ring" ringPercent={customerRing} sparklineData={sparkline30d} SparklineComponent={SparklineChart} />
         <KPICard title="Return Rate" value={kpi.returnRate.toFixed(1)} suffix="%" delta={kpi.deltas.returnRate} deltaLabel="Last 3 weeks" variant="sparkline" sparklineData={sparkline30d} sparklineColor="#ef4444" SparklineComponent={SparklineChart} />

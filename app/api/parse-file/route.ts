@@ -13,14 +13,12 @@ import { enforceCsrf } from '@/lib/server/security'
 import { createRequestLogContext } from '@/lib/server/logger'
 import { captureBackendError } from '@/lib/server/sentry'
 import { writeJsonArtifact } from '@/lib/server/artifact-store'
+import { allowAction } from '@/lib/server/rate-limit'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
 
 const MAX_UPLOAD_BYTES = 500 * 1024 * 1024
-const UPLOAD_WINDOW_MS = 60_000
-const UPLOAD_LIMIT_PER_WINDOW = 10
-const uploadRateStore = new Map<string, number[]>()
 const AV_SCANNER_ENABLED = process.env.ENABLE_AV_SCAN === 'true'
 const BLOCKED_MIME_PREFIXES = ['application/x-msdownload', 'application/x-dosexec']
 
@@ -28,20 +26,6 @@ function readClientKey(req: NextRequest): string {
   const forwarded = req.headers.get('x-forwarded-for')
   if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown'
   return req.headers.get('x-real-ip') ?? 'unknown'
-}
-
-function allowUpload(clientKey: string): boolean {
-  const now = Date.now()
-  const windowStart = now - UPLOAD_WINDOW_MS
-  const attempts = uploadRateStore.get(clientKey) ?? []
-  const fresh = attempts.filter((ts) => ts > windowStart)
-  if (fresh.length >= UPLOAD_LIMIT_PER_WINDOW) {
-    uploadRateStore.set(clientKey, fresh)
-    return false
-  }
-  fresh.push(now)
-  uploadRateStore.set(clientKey, fresh)
-  return true
 }
 
 async function runAntivirusScan(fileName: string, buffer: Buffer): Promise<{ ok: boolean; reason?: string }> {
@@ -248,7 +232,13 @@ export async function POST(req: NextRequest) {
     }
 
     const clientKey = readClientKey(req)
-    if (!allowUpload(clientKey)) {
+    const uploadAllowed = await allowAction({
+      key: clientKey,
+      action: 'file-upload',
+      limit: 10,
+      windowMs: 60_000,
+    })
+    if (!uploadAllowed) {
       requestLog.finish(429, { workspace_id: auth.workspaceId, user_id: auth.userId })
       return NextResponse.json({ error: 'Rate limit exceeded. Please try again later.' }, { status: 429 })
     }

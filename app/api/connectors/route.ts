@@ -49,7 +49,6 @@ export async function POST(req: NextRequest) {
     displayName?: string
     config?: Record<string, unknown>
   }
-  const config = (body.config ?? {}) as Record<string, unknown>
   const type = body.type
   if (!type) {
     return NextResponse.json({ error: 'Connector type is required' }, { status: 400 })
@@ -57,7 +56,7 @@ export async function POST(req: NextRequest) {
 
   const existingConnector = await prisma.connector.findFirst({
     where: { workspaceId: auth.workspaceId, type },
-    select: { id: true },
+    select: { id: true, config: true },
   })
   if (!existingConnector) {
     const planCheck = await checkPlanLimit({
@@ -69,7 +68,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: planCheck.message }, { status: 403 })
     }
   }
-  const encryptedConfig = encryptConnectorConfig(config)
+
+  // Only re-encrypt and overwrite config when the caller explicitly provides it.
+  // Omitting `config` in an update (e.g. renaming a connector) preserves credentials.
+  const encryptedConfig =
+    body.config !== undefined
+      ? encryptConnectorConfig(body.config)
+      : (existingConnector?.config ?? encryptConnectorConfig({}))
 
   const connector = await prisma.connector.upsert({
     where: {

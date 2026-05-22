@@ -37,9 +37,22 @@ const nextConfig = {
   // Security headers
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production'
-    const allowUnsafeInline =
-      process.env.CSP_ALLOW_UNSAFE_INLINE === 'true' ||
-      (!isProduction && process.env.CSP_ALLOW_UNSAFE_INLINE !== 'false')
+
+    // In dev, webpack HMR requires 'unsafe-eval' (source maps / fast-refresh runtime)
+    // and blob: (dynamic chunk loading). Neither is allowed in production.
+    const scriptSrc = isProduction
+      ? "script-src 'self'"
+      : "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:"
+
+    const styleSrc = isProduction
+      ? "style-src 'self'"
+      : "style-src 'self' 'unsafe-inline'"
+
+    // Dev HMR uses a WebSocket on the same host; allow it explicitly.
+    const connectSrc = isProduction
+      ? "connect-src 'self' https:"
+      : "connect-src 'self' https: ws://localhost:* wss://localhost:*"
+
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
@@ -47,12 +60,12 @@ const nextConfig = {
       "object-src 'none'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      allowUnsafeInline ? "style-src 'self' 'unsafe-inline'" : "style-src 'self'",
-      allowUnsafeInline ? "script-src 'self' 'unsafe-inline'" : "script-src 'self'",
+      styleSrc,
+      scriptSrc,
       "script-src-attr 'none'",
-      "connect-src 'self' https:",
+      connectSrc,
       "form-action 'self'",
-      "upgrade-insecure-requests",
+      ...(isProduction ? ["upgrade-insecure-requests"] : []),
     ].join('; ')
 
     return [

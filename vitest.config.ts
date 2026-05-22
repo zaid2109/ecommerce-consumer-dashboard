@@ -13,7 +13,14 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
-      include: ['lib/server/data-quality.ts', 'lib/kpi-formulas.ts'],
+      include: [
+        'lib/server/data-quality.ts',
+        'lib/kpi-formulas.ts',
+        'lib/server/mfa.ts',
+        'lib/server/connector-secrets.ts',
+        'lib/server/stripe-webhook.ts',
+        'lib/server/auth.ts',
+      ],
       exclude: ['**/*.d.ts'],
       thresholds: {
         lines: 70,

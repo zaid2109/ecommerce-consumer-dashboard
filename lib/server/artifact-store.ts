@@ -28,19 +28,24 @@ function required(name: string): string {
   return value
 }
 
+let s3ClientInstance: S3Client | null = null
+
 function createS3Client(): S3Client {
+  if (s3ClientInstance) return s3ClientInstance
+
   const endpoint = process.env.ARTIFACT_S3_ENDPOINT?.trim()
   const accessKeyId = required('ARTIFACT_S3_ACCESS_KEY_ID')
   const secretAccessKey = required('ARTIFACT_S3_SECRET_ACCESS_KEY')
   const region = process.env.ARTIFACT_S3_REGION?.trim() || 'us-east-1'
   const forcePathStyle = (process.env.ARTIFACT_S3_FORCE_PATH_STYLE ?? 'true').trim().toLowerCase() === 'true'
 
-  return new S3Client({
+  s3ClientInstance = new S3Client({
     region,
     endpoint: endpoint || undefined,
     credentials: { accessKeyId, secretAccessKey },
     forcePathStyle,
   })
+  return s3ClientInstance
 }
 
 function bucketName(): string {
@@ -107,4 +112,44 @@ export async function readJsonArtifact<T>(key: string): Promise<T | null> {
     return readJsonS3<T>(key)
   }
   return readJsonFilesystem<T>(key)
+}
+
+// Stores a raw binary buffer (e.g. XLSX) instead of JSON-serialized content.
+export async function writeBinaryArtifact(key: string, data: Buffer, contentType: string): Promise<void> {
+  if (getProvider() === 's3') {
+    const client = createS3Client()
+    const normalizedKey = normalizeKey(key)
+    await client.send(
+      new PutObjectCommand({
+        Bucket: bucketName(),
+        Key: normalizedKey,
+        Body: data,
+        ContentType: contentType,
+      })
+    )
+    return
+  }
+  const filePath = toSafePath(key)
+  await fs.mkdir(path.dirname(filePath), { recursive: true })
+  await fs.writeFile(filePath, data)
+}
+
+// Reads a binary artifact (returns null if not found).
+export async function readBinaryArtifact(key: string): Promise<Buffer | null> {
+  if (getProvider() === 's3') {
+    try {
+      const client = createS3Client()
+      const normalizedKey = normalizeKey(key)
+      const object = await client.send(new GetObjectCommand({ Bucket: bucketName(), Key: normalizedKey }))
+      const bytes = await object.Body?.transformToByteArray()
+      return bytes ? Buffer.from(bytes) : null
+    } catch {
+      return null
+    }
+  }
+  try {
+    return await fs.readFile(toSafePath(key))
+  } catch {
+    return null
+  }
 }

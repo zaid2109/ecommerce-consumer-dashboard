@@ -4,7 +4,7 @@ import { prisma } from '@/lib/server/prisma'
 import { canAccess, readAuthContext } from '@/lib/server/auth'
 import type { UserRole } from '@prisma/client'
 import { enforceCsrf } from '@/lib/server/security'
-import { checkPlanLimit } from '@/lib/server/plan-limits'
+import { atomicCreateUserWithSeatCheck } from '@/lib/server/plan-limits'
 
 export const runtime = 'nodejs'
 
@@ -47,25 +47,22 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const planCheck = await checkPlanLimit({
-    workspaceId: auth.workspaceId,
-    metric: 'seats',
-    increment: 1,
-  })
-  if (!planCheck.ok) {
-    return NextResponse.json({ error: planCheck.message }, { status: 403 })
-  }
-
   const passwordHash = await bcrypt.hash(password, 12)
-  const member = await prisma.user.create({
-    data: {
-      workspaceId: auth.workspaceId,
+
+  const result = await prisma.$transaction(async (tx) => {
+    return atomicCreateUserWithSeatCheck(tx, auth.workspaceId, {
+      workspace: { connect: { id: auth.workspaceId } },
       email,
       role,
       passwordHash,
-    },
-    select: { id: true, email: true, role: true, createdAt: true },
+    })
   })
+
+  if (!result.ok) {
+    return NextResponse.json({ error: result.message }, { status: 403 })
+  }
+
+  const member = result.user
 
   await prisma.auditLog.create({
     data: {

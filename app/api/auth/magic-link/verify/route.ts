@@ -6,6 +6,66 @@ import { createCsrfToken } from '@/lib/server/security'
 
 export const runtime = 'nodejs'
 
+// GET /api/auth/magic-link/verify?email=...&token=...
+// Called when the user clicks the magic-link URL in their email.
+// Sets auth cookies and redirects to /dashboard.
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl
+  const email = (searchParams.get('email') ?? '').trim().toLowerCase()
+  const token = (searchParams.get('token') ?? '').trim()
+
+  if (!email || !token) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
+
+  const candidates = await prisma.magicLinkToken.findMany({
+    where: { email, usedAt: null, expiresAt: { gt: new Date() } },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+  })
+
+  let matched: (typeof candidates)[number] | null = null
+  for (const item of candidates) {
+    const ok = await bcrypt.compare(token, item.tokenHash)
+    if (ok) { matched = item; break }
+  }
+  if (!matched) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } })
+  if (!user) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
+
+  await prisma.magicLinkToken.update({ where: { id: matched.id }, data: { usedAt: new Date() } })
+
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? req.headers.get('x-real-ip')
+  const session = await createAuthSession({
+    userId: user.id,
+    workspaceId: user.workspaceId,
+    role: user.role,
+    ip,
+    userAgent: req.headers.get('user-agent'),
+  })
+
+  await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } })
+
+  const response = NextResponse.redirect(new URL('/dashboard', req.url))
+  const cookieOpts = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict' as const,
+    path: '/',
+    expires: session.expiresAt,
+  }
+  response.cookies.set('access_token', session.accessToken, cookieOpts)
+  response.cookies.set('refresh_token', session.refreshToken, cookieOpts)
+  response.cookies.set('session_id', session.sessionId, cookieOpts)
+  response.cookies.set('csrf_token', createCsrfToken(), { ...cookieOpts, httpOnly: false })
+  return response
+}
+
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as { email?: string; token?: string }
   const email = (body.email ?? '').trim().toLowerCase()

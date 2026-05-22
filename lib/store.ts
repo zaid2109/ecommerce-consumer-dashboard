@@ -51,6 +51,7 @@ export const useFilterStore = create<FilterState & FilterActions>((set) => ({
       countries: state.countries,
       paymentMethods: state.paymentMethods,
     }),
+  // activePage is intentionally preserved across resets — it reflects routing state, not filter state.
   resetFilters: () =>
     set({
       dateRange: [twoYearsAgo, now],

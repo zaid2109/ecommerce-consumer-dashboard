@@ -1,5 +1,18 @@
-import { describe, expect, it } from 'vitest'
-import { canAccess } from '@/lib/server/auth'
+import { describe, expect, it, beforeAll } from 'vitest'
+
+beforeAll(() => {
+  process.env.JWT_SECRET = 'test-secret-32-bytes-long-enough!!'
+  process.env.DATABASE_URL = 'postgresql://localhost/test'
+  process.env.CONNECTOR_ENCRYPTION_KEY = Buffer.alloc(32).toString('base64')
+})
+
+// Dynamic import after env is set to avoid module-level env validation throw.
+let canAccess: (role: string, action: string) => boolean
+
+beforeAll(async () => {
+  const mod = await import('@/lib/server/auth')
+  canAccess = mod.canAccess as typeof canAccess
+})
 
 describe('auth permission matrix', () => {
   it('allows OWNER for all admin actions', () => {

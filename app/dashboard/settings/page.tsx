@@ -278,7 +278,7 @@ export default function SettingsPage() {
           <li>Next.js 14 + App Router</li>
           <li>TypeScript + Zustand + Recharts</li>
           <li>TanStack Table + React Virtuoso</li>
-          <li>Web Worker powered data generation</li>
+          <li>AI-powered dataset analysis (Anthropic SDK)</li>
         </ul>
       </section>
     </div>

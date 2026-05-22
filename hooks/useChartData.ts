@@ -209,14 +209,8 @@ export function useDailyRevenue(granularity: 'daily' | 'weekly' | 'monthly'): Re
 }
 
 export function useCategoryData() {
-  const { aggregated, orders } = useDataset()
-  const filterState = useFilterStore((state) => ({
-    dateRange: state.dateRange,
-    categories: state.categories,
-    segments: state.segments,
-    countries: state.countries,
-    paymentMethods: state.paymentMethods,
-  }))
+  const { aggregated } = useDataset()
+  const filteredOrders = useFilteredOrders()
 
   return useMemo(() => {
     const categoryTotals = new Map<Order['category'], { orders: number; returns: number; revenue: number }>()
@@ -224,8 +218,7 @@ export function useCategoryData() {
       categoryTotals.set(category, { orders: 0, returns: 0, revenue: 0 })
     }
 
-    for (const order of orders) {
-      if (!orderMatchesFilters(order, filterState)) continue
+    for (const order of filteredOrders) {
       const totals = categoryTotals.get(order.category)
       if (!totals) continue
       totals.orders += 1
@@ -250,7 +243,7 @@ export function useCategoryData() {
       .sort((a, b) => b.revenue - a.revenue)
       .map((item, index) => ({ ...item, rank: index + 1 }))
       .slice(0, 10)
-  }, [filterState, aggregated, orders])
+  }, [filteredOrders, aggregated])
 }
 
 export function useSegmentData() {

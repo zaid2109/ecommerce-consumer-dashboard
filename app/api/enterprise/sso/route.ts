@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/server/prisma'
 import { canAccess, readAuthContext } from '@/lib/server/auth'
 import { enforceCsrf } from '@/lib/server/security'
+import { encryptConnectorConfig } from '@/lib/server/connector-secrets'
 
 export const runtime = 'nodejs'
 
@@ -34,6 +35,12 @@ export async function POST(req: NextRequest) {
     enabled?: boolean
   }
   const providerType = body.providerType === 'SAML' ? 'SAML' : 'OIDC'
+  // Encrypt the client secret before storing — same pattern as connector credentials.
+  const rawSecret = body.clientSecret?.trim() || null
+  const encryptedSecret = rawSecret
+    ? (encryptConnectorConfig({ clientSecret: rawSecret }) as object)
+    : null
+
   const config = await prisma.ssoConfig.create({
     data: {
       workspaceId: auth.workspaceId,
@@ -41,7 +48,7 @@ export async function POST(req: NextRequest) {
       issuer: body.issuer?.trim() || null,
       entryPoint: body.entryPoint?.trim() || null,
       clientId: body.clientId?.trim() || null,
-      clientSecret: body.clientSecret?.trim() || null,
+      clientSecret: encryptedSecret ? JSON.stringify(encryptedSecret) : null,
       metadataUrl: body.metadataUrl?.trim() || null,
       enabled: body.enabled ?? false,
     },

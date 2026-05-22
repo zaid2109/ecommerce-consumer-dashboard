@@ -28,18 +28,19 @@ export const SparklineChart = memo(function SparklineChart({
 
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <AreaChart data={chartData}>
+      <AreaChart data={chartData} margin={{ top: 2, right: 2, bottom: 0, left: 2 }}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity={0.35} />
-            <stop offset="100%" stopColor={color} stopOpacity={0.04} />
+            <stop offset="0%" stopColor={color} stopOpacity={0.5} />
+            <stop offset="75%" stopColor={color} stopOpacity={0.08} />
+            <stop offset="100%" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
         <Area
           type="monotone"
           dataKey="value"
           stroke={color}
-          strokeWidth={2}
+          strokeWidth={1.75}
           fill={`url(#${gradientId})`}
           dot={false}
           isAnimationActive={!hasAnimated.current}
@@ -52,5 +53,3 @@ export const SparklineChart = memo(function SparklineChart({
 SparklineChart.displayName = 'SparklineChart'
 
 export default SparklineChart
-
-

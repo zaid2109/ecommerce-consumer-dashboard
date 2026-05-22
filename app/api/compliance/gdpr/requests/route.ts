@@ -73,12 +73,26 @@ export async function POST(req: NextRequest) {
       },
     })
   } else {
-    await prisma.session.deleteMany({
-      where: { user: { email: subjectEmail, workspaceId: auth.workspaceId } },
+    // Resolve the user so we can cascade-delete their records.
+    const targetUser = await prisma.user.findUnique({
+      where: { email: subjectEmail },
+      select: { id: true, workspaceId: true },
     })
-    await prisma.user.deleteMany({
-      where: { email: subjectEmail, workspaceId: auth.workspaceId },
-    })
+
+    if (targetUser && targetUser.workspaceId === auth.workspaceId) {
+      // Delete in dependency order to avoid FK violations.
+      await prisma.session.deleteMany({ where: { userId: targetUser.id } })
+      await prisma.savedView.deleteMany({ where: { createdById: targetUser.id } })
+      await prisma.exportJob.deleteMany({ where: { createdById: targetUser.id } })
+      await prisma.alertRule.deleteMany({ where: { createdById: targetUser.id } })
+      // Anonymise audit logs rather than deleting them (audit trail must be kept).
+      await prisma.auditLog.updateMany({
+        where: { userId: targetUser.id },
+        data: { userId: null },
+      })
+      await prisma.user.delete({ where: { id: targetUser.id } })
+    }
+
     await prisma.gdprRequest.update({
       where: { id: created.id },
       data: { status: 'COMPLETED', completedAt: new Date() },

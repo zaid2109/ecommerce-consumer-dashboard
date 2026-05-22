@@ -2,60 +2,69 @@
 
 import { memo, useEffect, useRef } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
-import { formatCurrency } from '@/lib/utils'
 import SpireTooltip from './ChartTooltip'
 
 type CategoryDonutPoint = { name: string; value: number; color: string }
 
-type CategoryDonutChartProps = {
-  data: CategoryDonutPoint[]
-  centerLabel?: string
-}
-
 export const CategoryDonutChart = memo(function CategoryDonutChart({
   data,
   centerLabel,
-}: CategoryDonutChartProps) {
+}: {
+  data: CategoryDonutPoint[]
+  centerLabel?: string
+}) {
   const hasAnimated = useRef(false)
+  useEffect(() => { hasAnimated.current = true }, [])
 
-  useEffect(() => {
-    hasAnimated.current = true
-  }, [])
+  const total = data.reduce((s, d) => s + d.value, 0)
 
   return (
-    <ResponsiveContainer width="100%" height={340}>
+    <ResponsiveContainer width="100%" height={300}>
       <PieChart>
-        <Tooltip content={(props) => <SpireTooltip {...props} formatter={(value: number) => formatCurrency(value)} />} />
+        <Tooltip
+          content={(props) => (
+            <SpireTooltip
+              {...props}
+              formatter={(value: number) =>
+                `${value.toLocaleString()} (${total ? ((value / total) * 100).toFixed(1) : 0}%)`
+              }
+            />
+          )}
+        />
         <Pie
           data={data}
           dataKey="value"
           nameKey="name"
-          innerRadius={70}
-          outerRadius={112}
+          innerRadius={76}
+          outerRadius={118}
           paddingAngle={2}
+          stroke="none"
           isAnimationActive={!hasAnimated.current}
         >
           {data.map((entry) => (
-            <Cell key={entry.name} fill={entry.color} />
+            <Cell
+              key={entry.name}
+              fill={entry.color}
+              stroke="#141820"
+              strokeWidth={2}
+            />
           ))}
         </Pie>
-        {centerLabel ? (
+
+        {centerLabel && (
           <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central">
-            <tspan x="50%" dy="-8" fontSize="22" fontWeight="700" fill="#f1f5f9">
+            <tspan x="50%" dy="-9" fontSize="26" fontWeight="800" fill="#f1f5f9">
               {centerLabel.replace('★', '')}
             </tspan>
-            <tspan x="50%" dy="18" fontSize="11" fill="#64748b">
-              avg rating
+            <tspan x="50%" dy="20" fontSize="10" fill="#6b7280" letterSpacing="0.06em">
+              AVG RATING
             </tspan>
           </text>
-        ) : null}
+        )}
       </PieChart>
     </ResponsiveContainer>
   )
 })
 
 CategoryDonutChart.displayName = 'CategoryDonutChart'
-
 export default CategoryDonutChart
-
-

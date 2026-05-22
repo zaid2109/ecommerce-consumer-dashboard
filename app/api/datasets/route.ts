@@ -71,6 +71,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing idempotency key' }, { status: 400 })
   }
 
+  // Validate that artifact keys are scoped to this workspace to prevent cross-tenant writes.
+  const ownPrefix = `workspace/${auth.workspaceId}/`
+  if (body.rawArtifactKey && !body.rawArtifactKey.startsWith(ownPrefix)) {
+    requestLog.finish(400, { workspace_id: auth.workspaceId, user_id: auth.userId })
+    return NextResponse.json({ error: 'Invalid rawArtifactKey' }, { status: 400 })
+  }
+  if (body.processedArtifactKey && !body.processedArtifactKey.startsWith(ownPrefix)) {
+    requestLog.finish(400, { workspace_id: auth.workspaceId, user_id: auth.userId })
+    return NextResponse.json({ error: 'Invalid processedArtifactKey' }, { status: 400 })
+  }
+
   const rowsToAdd = Math.max(0, body.rowCount ?? 0)
   const planCheck = await checkPlanLimit({
     workspaceId: auth.workspaceId,

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/server/prisma'
 import { canAccess, readAuthContext } from '@/lib/server/auth'
-import { runConnectorSync } from '@/lib/server/connectors'
 import { ingestConnectorToDataset } from '@/lib/server/connector-ingestion'
 import { allowAction } from '@/lib/server/rate-limit'
 import { enforceCsrf } from '@/lib/server/security'
@@ -54,7 +53,8 @@ export async function POST(
 
   try {
     const decryptedConfig = decryptConnectorConfig(connector.config)
-    const result = await runConnectorSync(connector.type, decryptedConfig)
+    // ingestConnectorToDataset fetches, deduplicates, transforms, and persists in one pass.
+    // We no longer call runConnectorSync separately to avoid a duplicate HTTP round-trip.
     const ingestion = await ingestConnectorToDataset({
       connectorId: connector.id,
       workspaceId: auth.workspaceId,
@@ -66,13 +66,13 @@ export async function POST(
       where: { id: connector.id },
       data: {
         status: 'CONNECTED',
-        rowsSynced: connector.rowsSynced + result.rowsSynced,
+        rowsSynced: (connector.rowsSynced ?? 0) + ingestion.rowsSynced,
         lastSyncAt: new Date(),
         lastError: null,
       },
     })
     const metadata = {
-      ...result.metadata,
+      source: connector.type.toLowerCase(),
       ingestion,
     } as Prisma.InputJsonValue
 
@@ -95,7 +95,7 @@ export async function POST(
       },
     })
 
-    return NextResponse.json({ connector: updated, result })
+    return NextResponse.json({ connector: updated, ingestion })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sync failed'
     logError('connector.sync.error', {

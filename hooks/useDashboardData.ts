@@ -107,12 +107,11 @@ export function useCustomerAggregates() {
 export function useAnalyticsPageData() {
   const { customers, filteredOrders } = useCustomerAggregates()
 
-  return useMemo(() => {
+  const kpi = useMemo(() => {
     const totalOrders = filteredOrders.length
     const totalCustomers = customers.length || 1
     const totalRevenue = customers.reduce((s, c) => s + c.totalSpent, 0)
     const repeatCustomers = customers.filter((c) => c.totalOrders > 1).length
-
     const avgOrdersPerCustomer = totalOrders / totalCustomers
     const repeatPurchaseRate = (repeatCustomers / totalCustomers) * 100
     const estimatedLTV = totalRevenue / totalCustomers
@@ -132,8 +131,15 @@ export function useAnalyticsPageData() {
         intervalsCount += 1
       }
     }
-    const avgDaysBetween = intervalsCount ? intervalsSum / intervalsCount : 0
+    return {
+      avgOrdersPerCustomer,
+      repeatPurchaseRate,
+      avgDaysBetween: intervalsCount ? intervalsSum / intervalsCount : 0,
+      estimatedLTV,
+    }
+  }, [customers, filteredOrders])
 
+  const frequencyData = useMemo(() => {
     const buckets = [
       { bucket: '1 order', count: 0 },
       { bucket: '2', count: 0 },
@@ -152,7 +158,10 @@ export function useAnalyticsPageData() {
       else if (c.totalOrders <= 10) buckets[5].count += 1
       else buckets[6].count += 1
     }
+    return buckets
+  }, [customers])
 
+  const { dayOfWeekData, timeOfDayData } = useMemo(() => {
     const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     const dayCounts = dayOrder.map((day) => ({ day, orders: 0 }))
     const timeHeatmap = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0))
@@ -163,7 +172,10 @@ export function useAnalyticsPageData() {
       dayCounts[idx].orders += 1
       timeHeatmap[idx][hr] += 1
     }
+    return { dayOfWeekData: dayCounts, timeOfDayData: timeHeatmap }
+  }, [filteredOrders])
 
+  const movingAverageData = useMemo(() => {
     const dailyMap = new Map<string, number>()
     for (const order of filteredOrders) {
       const d = new Date(order.orderDate.getFullYear(), order.orderDate.getMonth(), order.orderDate.getDate())
@@ -173,14 +185,16 @@ export function useAnalyticsPageData() {
     const daily = Array.from(dailyMap.entries())
       .map(([date, raw]) => ({ date, raw }))
       .sort((a, b) => a.date.localeCompare(b.date))
-    const movingAverage = daily.map((p, i, arr) => {
+    return daily.map((p, i, arr) => {
       const w7 = arr.slice(Math.max(0, i - 6), i + 1)
       const w30 = arr.slice(Math.max(0, i - 29), i + 1)
       const ma7 = w7.reduce((s, x) => s + x.raw, 0) / w7.length
       const ma30 = w30.reduce((s, x) => s + x.raw, 0) / w30.length
       return { date: p.date, raw: p.raw, ma7, ma30 }
     })
+  }, [filteredOrders])
 
+  const cohortData = useMemo(() => {
     const cohorts = Array.from({ length: 12 }, () => Array.from({ length: 12 }, () => 0))
     const cohortMembers = Array.from({ length: 12 }, () => 0)
     const now = new Date()
@@ -209,20 +223,21 @@ export function useAnalyticsPageData() {
         cohorts[r][c] = cohortMembers[r] ? Math.round((cohorts[r][c] / cohortMembers[r]) * 100) : 0
       }
     }
+    return cohorts
+  }, [filteredOrders])
 
-    return {
-      kpi: { avgOrdersPerCustomer, repeatPurchaseRate, avgDaysBetween, estimatedLTV },
-      frequencyData: buckets,
-      cohortData: cohorts,
-      dayOfWeekData: dayCounts,
-      timeOfDayData: timeHeatmap,
-      movingAverageData: movingAverage,
-      tableRows: customers,
-      insight: `📈 Repeat purchase rate is ${repeatPurchaseRate.toFixed(1)}% with avg ${avgOrdersPerCustomer.toFixed(
-        2
-      )} orders/customer. Biggest lift opportunity is customers still at 1 order.`,
-    }
-  }, [customers, filteredOrders])
+  return {
+    kpi,
+    frequencyData,
+    cohortData,
+    dayOfWeekData,
+    timeOfDayData,
+    movingAverageData,
+    tableRows: customers,
+    insight: `📈 Repeat purchase rate is ${kpi.repeatPurchaseRate.toFixed(1)}% with avg ${kpi.avgOrdersPerCustomer.toFixed(
+      2
+    )} orders/customer. Biggest lift opportunity is customers still at 1 order.`,
+  }
 }
 
 export function useCustomersPageData() {

@@ -1,4 +1,4 @@
-import type { WorkspacePlan } from '@prisma/client'
+import type { WorkspacePlan, Prisma } from '@prisma/client'
 import { prisma } from './prisma'
 
 type PlanLimits = {
@@ -7,7 +7,7 @@ type PlanLimits = {
   monthlyRows: number
 }
 
-const LIMITS: Record<WorkspacePlan, PlanLimits> = {
+export const PLAN_LIMITS: Record<WorkspacePlan, PlanLimits> = {
   STARTER: { seats: 1, connectors: 0, monthlyRows: 200_000 },
   GROWTH: { seats: 10, connectors: 20, monthlyRows: 5_000_000 },
   ENTERPRISE: { seats: 100, connectors: 100, monthlyRows: 50_000_000 },
@@ -34,7 +34,7 @@ export async function getWorkspaceUsage(workspaceId: string) {
     throw new Error('Workspace not found')
   }
 
-  const limits = LIMITS[workspace.plan]
+  const limits = PLAN_LIMITS[workspace.plan]
   const monthlyRows = rows._sum.rowCount ?? 0
 
   return {
@@ -48,6 +48,7 @@ export async function getWorkspaceUsage(workspaceId: string) {
   }
 }
 
+// Non-atomic advisory check — suitable for connectors/rows where slight overcount is tolerable.
 export async function checkPlanLimit(input: {
   workspaceId: string
   metric: keyof PlanLimits
@@ -64,5 +65,34 @@ export async function checkPlanLimit(input: {
     }
   }
   return { ok: true }
+}
+
+type CreatedUser = { id: string; email: string; role: import('@prisma/client').UserRole; createdAt: Date }
+
+// Atomic seat check: count inside the same transaction that creates the user record.
+// Caller provides the Prisma transaction client and the create data.
+export async function atomicCreateUserWithSeatCheck(
+  tx: Prisma.TransactionClient,
+  workspaceId: string,
+  createData: Prisma.UserCreateInput
+): Promise<{ ok: true; user: CreatedUser } | { ok: false; message: string }> {
+  const workspace = await tx.workspace.findUnique({
+    where: { id: workspaceId },
+    select: { plan: true },
+  })
+  if (!workspace) return { ok: false, message: 'Workspace not found' }
+
+  const limit = PLAN_LIMITS[workspace.plan].seats
+  const current = await tx.user.count({ where: { workspaceId } })
+
+  if (current >= limit) {
+    return {
+      ok: false,
+      message: `Plan limit exceeded for seats. Current plan ${workspace.plan} allows up to ${limit}.`,
+    }
+  }
+
+  const user = await tx.user.create({ data: createData, select: { id: true, email: true, role: true, createdAt: true } })
+  return { ok: true, user }
 }
 

@@ -1,4 +1,4 @@
-import { readJsonArtifact, writeJsonArtifact } from '@/lib/server/artifact-store'
+import { readJsonArtifact, writeJsonArtifact, writeBinaryArtifact } from '@/lib/server/artifact-store'
 import { prisma } from '@/lib/server/prisma'
 
 type ExportFormat = 'CSV' | 'XLSX' | 'PDF'
@@ -21,7 +21,31 @@ function toCsv(rows: Array<Record<string, unknown>>): string {
   return `${header}\n${body}`
 }
 
-export async function runExportJob(exportJobId: string, workspaceId: string, datasetId: string | null, format: ExportFormat) {
+async function toXlsx(rows: Array<Record<string, unknown>>): Promise<Buffer> {
+  const ExcelJS = await import('exceljs')
+  const workbook = new ExcelJS.Workbook()
+  const sheet = workbook.addWorksheet('Export')
+
+  if (rows.length > 0) {
+    const columns = Array.from(new Set(rows.flatMap((r) => Object.keys(r))))
+    sheet.columns = columns.map((key) => ({ header: key, key, width: 18 }))
+    for (const row of rows) {
+      sheet.addRow(row)
+    }
+    // Bold the header row
+    sheet.getRow(1).font = { bold: true }
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer()
+  return Buffer.from(buffer)
+}
+
+export async function runExportJob(
+  exportJobId: string,
+  workspaceId: string,
+  datasetId: string | null,
+  format: ExportFormat
+) {
   const job = await prisma.exportJob.findFirst({
     where: { id: exportJobId, workspaceId },
     select: { id: true },
@@ -43,21 +67,42 @@ export async function runExportJob(exportJobId: string, workspaceId: string, dat
 
     const artifact = await readJsonArtifact<DatasetArtifact>(dataset.s3ProcessedKey)
     const rows = artifact?.orders ?? []
-    const csv = toCsv(rows)
 
-    const suffix = format.toLowerCase()
-    const artifactKey = `exports/${workspaceId}/${exportJobId}.${suffix === 'xlsx' ? 'csv' : suffix === 'pdf' ? 'txt' : 'csv'}`
-    await writeJsonArtifact(artifactKey, {
-      format,
-      generatedAt: new Date().toISOString(),
-      datasetId,
-      datasetName: dataset.name,
-      content: csv,
-      note:
-        format === 'CSV'
-          ? null
-          : `Requested ${format} export is stored as text payload for async job traceability. Hook a renderer service for native ${format}.`,
-    })
+    let artifactKey: string
+    let auditMeta: Record<string, unknown>
+
+    if (format === 'XLSX') {
+      const xlsxBuffer = await toXlsx(rows)
+      artifactKey = `exports/${workspaceId}/${exportJobId}.xlsx`
+      await writeBinaryArtifact(artifactKey, xlsxBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+      auditMeta = { exportedRows: rows.length, format, encoding: 'binary' }
+    } else if (format === 'PDF') {
+      // PDF generation requires an external renderer (e.g. Puppeteer, WeasyPrint).
+      // Until one is configured, we emit CSV and store it under a .pdf key so the
+      // job completes and callers receive a usable download.
+      const csv = toCsv(rows)
+      artifactKey = `exports/${workspaceId}/${exportJobId}.pdf`
+      await writeJsonArtifact(artifactKey, {
+        format: 'PDF',
+        note: 'PDF renderer not configured — content is CSV. Set up a PDF renderer service to produce native PDFs.',
+        generatedAt: new Date().toISOString(),
+        datasetId,
+        datasetName: dataset.name,
+        content: csv,
+      })
+      auditMeta = { exportedRows: rows.length, format, encoding: 'csv-fallback' }
+    } else {
+      const csv = toCsv(rows)
+      artifactKey = `exports/${workspaceId}/${exportJobId}.csv`
+      await writeJsonArtifact(artifactKey, {
+        format,
+        generatedAt: new Date().toISOString(),
+        datasetId,
+        datasetName: dataset.name,
+        content: csv,
+      })
+      auditMeta = { exportedRows: rows.length, format }
+    }
 
     await prisma.exportJob.update({
       where: { id: exportJobId },
@@ -65,11 +110,7 @@ export async function runExportJob(exportJobId: string, workspaceId: string, dat
         status: 'COMPLETED',
         artifactKey,
         completedAt: new Date(),
-        auditMetadata: {
-          completedByWorker: true,
-          exportedRows: rows.length,
-          format,
-        },
+        auditMetadata: { completedByWorker: true, ...auditMeta },
       },
     })
   } catch (error) {

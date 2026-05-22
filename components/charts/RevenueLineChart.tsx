@@ -1,7 +1,6 @@
 'use client'
 
 import { memo, useEffect, useRef } from 'react'
-import { useTheme } from 'next-themes'
 import {
   Area,
   AreaChart,
@@ -21,73 +20,104 @@ type RevenueLineChartProps = {
   granularity: 'daily' | 'weekly' | 'monthly'
 }
 
-export const RevenueLineChart = memo(function RevenueLineChart({
-  data,
-}: RevenueLineChartProps) {
+function formatDateLabel(dateStr: string, granularity: 'daily' | 'weekly' | 'monthly'): string {
+  try {
+    const d = new Date(`${dateStr}T00:00:00`)
+    if (granularity === 'monthly') return d.toLocaleString('en-US', { month: 'short', year: '2-digit' })
+    if (granularity === 'weekly') return d.toLocaleString('en-US', { month: 'short', day: 'numeric' })
+    return d.toLocaleString('en-US', { month: 'short', day: 'numeric' })
+  } catch {
+    return dateStr
+  }
+}
+
+export const RevenueLineChart = memo(function RevenueLineChart({ data, granularity }: RevenueLineChartProps) {
   const hasAnimated = useRef(false)
-  const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     hasAnimated.current = true
   }, [])
 
   return (
-    <div className="space-y-3">
-      <ResponsiveContainer width="100%" height={260}>
-        <AreaChart data={data}>
+    <div>
+      <ResponsiveContainer width="100%" height={264}>
+        <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
           <defs>
-            <linearGradient id="grossGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity={0.3} />
-              <stop offset="100%" stopColor="#6366f1" stopOpacity={0.02} />
+            <linearGradient id="rlc-gross" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#6366f1" stopOpacity={0.45} />
+              <stop offset="60%"  stopColor="#6366f1" stopOpacity={0.1} />
+              <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
             </linearGradient>
-            <linearGradient id="netGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.15} />
-              <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.01} />
+            <linearGradient id="rlc-net" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#a78bfa" stopOpacity={0.3} />
+              <stop offset="60%"  stopColor="#a78bfa" stopOpacity={0.06} />
+              <stop offset="100%" stopColor="#a78bfa" stopOpacity={0} />
             </linearGradient>
           </defs>
 
-          <CartesianGrid vertical={false} strokeDasharray="4 4" stroke={resolvedTheme === 'dark' ? '#1e2130' : '#f1f5f9'} />
-          <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} minTickGap={24} />
-          <YAxis tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${Math.round(v / 1000)}k`} />
+          <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#1e2433" />
+
+          <XAxis
+            dataKey="date"
+            tick={{ fontSize: 11, fill: '#4b5563' }}
+            axisLine={false}
+            tickLine={false}
+            minTickGap={32}
+            tickFormatter={(v) => formatDateLabel(v, granularity)}
+          />
+          <YAxis
+            width={54}
+            tick={{ fontSize: 11, fill: '#4b5563' }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+          />
+
           <Tooltip
             content={(props) => (
               <SpireTooltip
-                {...props}
+                active={props.active}
+                payload={props.payload}
+                label={props.label ? formatDateLabel(String(props.label), granularity) : undefined}
                 formatter={(value: number) => formatCurrency(value)}
               />
             )}
+            cursor={{ stroke: '#6366f1', strokeWidth: 1, strokeOpacity: 0.4 }}
           />
+
           <Area
             type="monotone"
             dataKey="gross"
             stroke="#6366f1"
             strokeWidth={2}
-            fill="url(#grossGradient)"
+            fill="url(#rlc-gross)"
             dot={false}
+            activeDot={{ r: 4, fill: '#6366f1', stroke: '#0d0f14', strokeWidth: 2 }}
             isAnimationActive={!hasAnimated.current}
-            name="Website sales"
+            name="Gross revenue"
           />
           <Area
             type="monotone"
             dataKey="net"
-            stroke="#8b5cf6"
-            strokeWidth={2}
-            fill="url(#netGradient)"
+            stroke="#a78bfa"
+            strokeWidth={1.5}
+            fill="url(#rlc-net)"
             dot={false}
+            activeDot={{ r: 4, fill: '#a78bfa', stroke: '#0d0f14', strokeWidth: 2 }}
             isAnimationActive={!hasAnimated.current}
-            name="In store sales"
+            name="Net revenue"
           />
         </AreaChart>
       </ResponsiveContainer>
 
-      <div className="flex items-center gap-4 mt-3 ml-2">
-        <span className="flex items-center gap-1.5 text-[12px] text-tx-secondary dark:text-tx-muted">
-          <span className="w-3 h-0.5 bg-[#6366f1] rounded-full inline-block" />
-          Website sales
+      <div className="flex items-center gap-5 mt-3 ml-14">
+        <span className="flex items-center gap-2 text-[11px] text-[#4b5563]">
+          <span className="w-8 h-[2px] rounded-full" style={{ background: '#6366f1' }} />
+          Gross revenue
         </span>
-        <span className="flex items-center gap-1.5 text-[12px] text-tx-secondary dark:text-tx-muted">
-          <span className="w-3 h-0.5 bg-[#8b5cf6] rounded-full inline-block" />
-          In store sales
+        <span className="flex items-center gap-2 text-[11px] text-[#4b5563]">
+          <span className="w-8 h-[1.5px] rounded-full" style={{ background: '#a78bfa' }} />
+          Net revenue
         </span>
       </div>
     </div>
@@ -95,7 +125,4 @@ export const RevenueLineChart = memo(function RevenueLineChart({
 })
 
 RevenueLineChart.displayName = 'RevenueLineChart'
-
 export default RevenueLineChart
-
-
