@@ -1,19 +1,8 @@
 'use client'
 
-type TooltipPayloadEntry = {
-  name?: string
-  value?: number
-  dataKey?: string
-  color?: string
-  stroke?: string
-}
+import type { ReactNode } from 'react'
 
-type SpireTooltipProps = {
-  active?: boolean
-  payload?: TooltipPayloadEntry[]
-  label?: string
-  formatter?: (value: number, dataKey: string | undefined) => string
-}
+type SpireTooltipProps = any
 
 export const SpireTooltip = ({ active, payload, label, formatter }: SpireTooltipProps) => {
   if (!active || !payload?.length) return null
@@ -37,7 +26,7 @@ export const SpireTooltip = ({ active, payload, label, formatter }: SpireTooltip
         </p>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-        {payload.map((p, i) => (
+        {payload.map((p: any, i: number) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94a3b8' }}>
               <span style={{
